@@ -1,0 +1,9 @@
+syntax on
+set number
+set hlsearch
+set incsearch
+set linebreak
+set smartcase
+set autoindent
+set ignorecase
+set backspace=indent,eol,start
