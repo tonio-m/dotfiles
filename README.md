@@ -1,19 +1,6 @@
 # dotfiles
 
-## Dotfiles used for:
-
-- os: ubuntu 20.04
-    - fm: nautilus
-    - terminal: kitty
-    - desktop: i3-gaps, i3-blocks, rofi, compton, i3-gnome
-
-
-- os: Windows 10 Pro Custom ISO
-    - fm: explorer (w/o search), everything
-    - terminal: windows-terminal + gnu coreutils
-    - desktop: microsoft PowerToys (FancyZones, Run, etc)
-
----
+I use these both on linux and windows.
 
 ```
 .
