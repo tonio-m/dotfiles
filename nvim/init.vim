@@ -17,8 +17,5 @@ set softtabstop=4
 
 call plug#begin()
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
-let g:coc_global_extensions=[
-    'coc-omnisharp',
-    'coc-python'
-]
+let g:coc_global_extensions=['coc-omnisharp','coc-python']
 call plug#end()
