@@ -14,8 +14,9 @@ set smartcase
 set ignorecase
 set relativenumber
 set foldmethod=indent
-set backspace=indent,eol,start
+hi Folded ctermbg=none
 set clipboard+=unnamedplus
+set backspace=indent,eol,start
 
 set expandtab
 set tabstop=4
