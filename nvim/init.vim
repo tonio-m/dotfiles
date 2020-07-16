@@ -36,3 +36,5 @@ command Sterm :sp | :terminal
 vnoremap * y/\V<C-R>=escape(@",'/\')<CR><CR>
 
 command SortByWidth :'<,'> ! awk '{ print length(), $0 | "sort -n | cut -d\\  -f2-" }'
+
+noremap <Leader>w :w<CR>
