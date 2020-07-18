@@ -1,7 +1,8 @@
 call plug#begin()
 
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
-let g:coc_global_extensions=['coc-omnisharp','coc-python']
+let g:coc_global_extensions=['coc-omnisharp']
+let g:kite_supported_languages = ['python']
 
 call plug#end()
 
