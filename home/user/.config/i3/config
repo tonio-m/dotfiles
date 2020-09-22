@@ -1,0 +1,112 @@
+set $mod Mod4
+floating_modifier $mod
+font pango:monospace 8
+
+exec --no-startup-id nm-applet
+exec_always --no-startup-id picom
+exec --no-startup-id hsetroot -solid "#000000"
+exec --no-startup-id xrandr --output eDP1 --mode 1366x768
+exec --no-startup-id xrandr --output HDMI1 --mode 1920x1080
+exec --no-startup-id setxkbmap -model abnt2 -layout br -variant abnt2
+exec --no-startup-id xss-lock --transfer-sleep-lock -- i3lock --nofork
+
+bindsym Print  exec "flameshot gui"
+bindsym $mod+Shift+Return exec "brave"
+bindsym $mod+Return exec "kitty --single-instance"
+bindsym $mod+d exec "dmenu_run -fn 'monospace 8'"
+bindsym $mod+t exec "kitty --single-instance --class floatingTerm"
+bindsym $mod+Escape exec "i3lock -c 000000"
+
+bindsym $mod+Shift+q kill
+bindsym $mod+Shift+c reload
+bindsym $mod+Shift+r restart
+bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -B 'Yes, exit i3' 'i3-msg exit'"
+
+
+bindsym $mod+Up focus up
+bindsym $mod+Left focus left
+bindsym $mod+Down focus down
+bindsym $mod+Right focus right
+
+bindsym $mod+shift+Up move up
+bindsym $mod+shift+Left move left
+bindsym $mod+shift+Down move down
+bindsym $mod+shift+Right move right
+
+bindsym $mod+k focus up
+bindsym $mod+h focus left
+bindsym $mod+j focus down
+bindsym $mod+l focus right
+
+bindsym $mod+a focus parent
+bindsym $mod+Shift+a focus child
+bindsym $mod+space focus mode_toggle
+
+bindsym $mod+shift+k move up
+bindsym $mod+shift+h move left
+bindsym $mod+shift+j move down
+bindsym $mod+shift+l move right
+
+bindsym $mod+v split v
+bindsym $mod+Shift+v split h
+bindsym $mod+f fullscreen toggle
+
+bindsym $mod+w layout tabbed
+bindsym $mod+s layout stacking
+bindsym $mod+e layout toggle split
+
+bindsym $mod+Shift+space floating toggle
+
+set $ws1 "1"
+set $ws2 "2"
+set $ws3 "3"
+set $ws4 "4"
+set $ws5 "5"
+set $ws6 "6"
+set $ws7 "7"
+set $ws8 "8"
+set $ws9 "9"
+set $ws10 "10"
+
+bindsym $mod+1 workspace number $ws1
+bindsym $mod+2 workspace number $ws2
+bindsym $mod+3 workspace number $ws3
+bindsym $mod+4 workspace number $ws4
+bindsym $mod+5 workspace number $ws5
+bindsym $mod+6 workspace number $ws6
+bindsym $mod+7 workspace number $ws7
+bindsym $mod+8 workspace number $ws8
+bindsym $mod+9 workspace number $ws9
+bindsym $mod+0 workspace number $ws10
+
+bindsym $mod+Shift+1 move container to workspace number $ws1
+bindsym $mod+Shift+2 move container to workspace number $ws2
+bindsym $mod+Shift+3 move container to workspace number $ws3
+bindsym $mod+Shift+4 move container to workspace number $ws4
+bindsym $mod+Shift+5 move container to workspace number $ws5
+bindsym $mod+Shift+6 move container to workspace number $ws6
+bindsym $mod+Shift+7 move container to workspace number $ws7
+bindsym $mod+Shift+8 move container to workspace number $ws8
+bindsym $mod+Shift+9 move container to workspace number $ws9
+bindsym $mod+Shift+0 move container to workspace number $ws10
+
+for_window [class="^.*"] border pixel 0
+for_window [class="^floatingTerm$"] floating enable
+
+bar {
+  font pango:monospace 10 
+  status_command i3blocks
+  position top
+  i3bar_command i3bar -t
+  colors {
+    background #00000000
+    urgent_workspace #00000000 #008B8B #fdf6e3
+    focused_workspace #00000000 #008B8B #fdf6e3
+    active_workspace #00000000 #00000000 #fdf6e3
+    inactive_workspace #00000000 #00000000 #fdf6e388
+  }
+}
+
+gaps inner 5
+gaps outer 5
+focus_follows_mouse no

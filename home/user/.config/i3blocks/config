@@ -1,0 +1,20 @@
+[batterybar]
+command=/home/user/.config/i3blocks/batterybar
+label=bat:
+interval=60
+markup=pango
+min_width=bat: ■■■■■
+
+[wifi]
+command=/home/user/.config/i3blocks/wifi
+label=wifi:
+interval=60
+
+[time]
+command=/home/user/.config/i3blocks/time
+interval=1
+
+[shutdown_menu]
+full_text=Quit
+command=/home/user/.config/i3blocks/shutdown_menu
+
