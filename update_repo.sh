@@ -22,6 +22,6 @@ do
         cp -r "$fullpath" ".$dirpath"
 
     else
-        echo "ERROR: path $fullpath does not exists"
+        echo "ERROR: path $fullpath does not exist"
     fi
 done
