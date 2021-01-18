@@ -16,7 +16,8 @@ bindsym $mod+Return exec "kitty --single-instance"
 # bindsym $mod+d exec "dmenu_run -fn 'monospace 8'"
 bindsym $mod+d exec "${HOME}/.config/i3/rofi.sh"
 bindsym $mod+t exec "kitty --single-instance --class floatingTerm"
-bindsym $mod+Escape exec "i3lock -c 000000"
+bindsym $mod+Escape exec "${HOME}/.config/i3/screen_lock.sh"
+# bindsym $mod+Escape exec "i3lock -c 000000"
 
 bindsym $mod+Shift+q kill
 bindsym $mod+Shift+c reload
