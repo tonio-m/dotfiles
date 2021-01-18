@@ -20,7 +20,7 @@ alias goto-vim="cd ~/.config/nvim/"
 alias goto-kitty="cd ~/.config/kitty/"
 alias goto-i3blocks="cd ~/.config/i3blocks/"
 
-export EDITOR='vim'
+export EDITOR='nvim'
 
 eval "$(pyenv init -)"
 source $ZSH/oh-my-zsh.sh
