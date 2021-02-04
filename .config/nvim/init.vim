@@ -23,6 +23,7 @@ set hlsearch
 set incsearch
 set linebreak
 set smartcase
+set noswapfile
 set ignorecase
 set relativenumber
 set foldmethod=indent
