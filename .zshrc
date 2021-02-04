@@ -19,12 +19,15 @@ alias goto-i3="cd ~/.config/i3/"
 alias goto-vim="cd ~/.config/nvim/"
 alias goto-kitty="cd ~/.config/kitty/"
 alias goto-i3blocks="cd ~/.config/i3blocks/"
+alias clipboard="~/.config/i3/rofi-clipboard.sh"
 
 export EDITOR='nvim'
 
 eval "$(pyenv init -)"
+eval $(/home/user/.linuxbrew/bin/brew shellenv)
 source $ZSH/oh-my-zsh.sh
 eval "$(pyenv virtualenv-init -)"
 
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+
