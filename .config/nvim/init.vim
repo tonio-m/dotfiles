@@ -2,6 +2,7 @@
 call plug#begin()
 Plug 'jeetsukumaran/vim-buffergator'
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
+Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'for': ['markdown', 'vim-plug']}
 call plug#end()
 
 let g:coc_global_extensions=[
@@ -47,7 +48,6 @@ nnoremap Y y$
 command Sterm :sp | :terminal
 command Vterm :vsp | :terminal
 command -range SortByWidth :<line1>,<line2>! awk '{ print length(), $0 | "sort -n | cut -d\\  -f2-" }'
-command -nargs=1 MarkdownPreview sp | term pandoc <f-args> | lynx -stdin
 command -nargs=1 SetTabSize call SetTabSize(<f-args>)
 command! -nargs=1 SaveBuffers call SaveBuffers(<f-args>) 
 
@@ -60,16 +60,4 @@ function SetTabSize(n)
   let &l:tabstop=a:n
   let &l:shiftwidth=a:n
   let &l:softtabstop=a:n
-endfunction
-
-function! SaveBuffers(folder)
-    call mkdir(a:folder, "p", 0700)
-    let bufferList = range(1,bufnr('$'))
-    call filter(bufferList, 'buflisted(v:val)')
-    execute 'sp'
-    for i in bufferList
-        execute 'bNext'
-        execute 'w ' . a:folder . '/' . i . '.' . &ft
-    endfor
-    execute 'q'
 endfunction
