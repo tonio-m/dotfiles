@@ -8,7 +8,8 @@ call plug#end()
 let g:coc_global_extensions=[
 \  'coc-omnisharp',
 \  'coc-python',
-\  'coc-json'
+\  'coc-json',
+\  'coc-go'
 \]
 
 " SECTION - TABS
