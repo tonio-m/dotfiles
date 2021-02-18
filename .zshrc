@@ -20,6 +20,7 @@ alias goto-vim="cd ~/.config/nvim/"
 alias goto-kitty="cd ~/.config/kitty/"
 alias goto-i3blocks="cd ~/.config/i3blocks/"
 alias clipboard="~/.config/i3/rofi-clipboard.sh"
+alias cb="clipboard"
 
 export EDITOR='nvim'
 
