@@ -2,7 +2,6 @@
 call plug#begin()
 Plug 'jeetsukumaran/vim-buffergator'
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
-Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'for': ['markdown', 'vim-plug']}
 call plug#end()
 
 let g:coc_global_extensions=[
@@ -21,6 +20,7 @@ set softtabstop=4
 " SECTION - EDITOR
 syntax on
 set number
+set nowrap
 set hlsearch
 set incsearch
 set linebreak
@@ -37,7 +37,7 @@ au TermOpen * setlocal nonumber norelativenumber
 
 " SECTION - REMAPS
 nnoremap S diw"0P
-tnoremap <Esc> <C-\><C-n>
+tnoremap <Esc><Esc> <C-\><C-n>
 noremap <silent> <C-l> <c-w>l
 noremap <silent> <C-h> <c-w>h
 noremap <silent> <C-k> <c-w>k
