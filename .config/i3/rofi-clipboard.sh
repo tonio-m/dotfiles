@@ -1,3 +1,4 @@
+#!/bin/zsh
 rofi \
 -modi "clipboard:greenclip print" \
 -show clipboard \
