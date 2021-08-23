@@ -2,6 +2,7 @@
 call plug#begin()
 Plug 'jeetsukumaran/vim-buffergator'
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
+Plug 'monsonjeremy/onedark.nvim'
 call plug#end()
 
 let g:coc_global_extensions=[
@@ -10,6 +11,8 @@ let g:coc_global_extensions=[
 \  'coc-json',
 \  'coc-go'
 \]
+
+lua require('onedark').setup()
 
 " SECTION - TABS
 set expandtab
