@@ -6,9 +6,9 @@ export ARCHFLAGS="-arch x86_64"
 export ZSH="$HOME/.config/.oh-my-zsh"
 export MANPATH="/usr/local/man:$MANPATH"
 export PYENV_VIRTUALENV_DISABLE_PROMPT=1
-export PATH="/home/user/.pyenv/bin:$PATH"
-export PATH="/home/user/.cargo/bin:$PATH"
-export GOPATH="/home/user/.local/share/go"
+export PATH="$HOME/.pyenv/bin:$PATH"
+export PATH="$HOME/.cargo/bin:$PATH"
+export GOPATH="$HOME/.local/share/go"
 export TERMINAL="kitty --single-instance"
 export XDG_DATA_HOME="$HOME/.local/share"
 export PATH=$HOME/bin:/usr/local/bin:$PATH
@@ -33,5 +33,3 @@ eval "$(pyenv virtualenv-init -)"
 
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
-
-bind 'set bell-style none'
