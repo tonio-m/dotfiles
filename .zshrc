@@ -4,15 +4,20 @@
 # keyboard layout
 setxkbmap -variant altgr-intl
 
-
-# prompt
-source ~/.config/scripts/minimal.zsh
-
 # path variable
 PATH="$HOME/.local/bin/:$PATH"
 PATH="$HOME/.cargo/bin:$PATH"
 PATH="/opt/resolve/bin:$PATH"
+PATH="$HOME/.pyenv/bin/:$PATH"
+PATH="/home/user/repos/musicnn-cpp/essentia/src/essentia:$PATH"
 export PATH
+
+# prompt
+source ~/.config/scripts/minimal.zsh
+
+# pyenv
+eval "$(pyenv init -)"
+eval "$(pyenv virtualenv-init -)"
 
 # aliases
 alias vim=lvim

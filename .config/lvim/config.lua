@@ -12,6 +12,8 @@ an executable
 lvim.log.level = "warn"
 lvim.format_on_save = true
 lvim.colorscheme = "onedarker"
+vim.opt.shell = "/usr/bin/zsh"
+
 
 -- keymappings [view all the defaults by pressing <leader>Lk]
 lvim.leader = "space"
@@ -21,7 +23,23 @@ lvim.keys.normal_mode["<C-s>"] = ":w<cr>"
 -- lvim.keys.normal_mode["<C-Up>"] = false
 -- edit a default keymapping
 -- lvim.keys.normal_mode["<C-q>"] = ":q<cr>"
-vim.api.nvim_set_keymap('t','<Esc><Esc>', '<C-\\><C-n>', { noremap = true })
+vim.api.nvim_set_keymap('t', '<Esc><Esc>', '<C-\\><C-n>', { noremap = true })
+vim.cmd([[
+  command! -range SortByWidth :<line1>,<line2>! awk '{ print length(), $0 | "sort -n | cut -d\\  -f2-" }'
+]])
+vim.cmd([[
+  function! SetTabSize(n)
+    let &l:tabstop=a:n
+    let &l:shiftwidth=a:n
+    let &l:softtabstop=a:n
+  endfunction
+  command! -nargs=1 SetTabSize call SetTabSize(<f-args>)
+]])
+
+vim.cmd([[
+  set foldmethod=indent
+]])
+
 
 -- Change Telescope navigation to use j and k for navigation and n and p for history in both input and normal mode.
 -- we use protected-mode (pcall) just in case the plugin wasn't loaded yet.
@@ -43,7 +61,8 @@ vim.api.nvim_set_keymap('t','<Esc><Esc>', '<C-\\><C-n>', { noremap = true })
 
 -- Use which-key to add extra bindings with the leader-key prefix
 -- lvim.builtin.which_key.mappings["P"] = { "<cmd>Telescope projects<CR>", "Projects" }
-lvim.builtin.which_key.mappings['a'] = { "<cmd>enew<CR>", 'Add Buffer' }
+lvim.builtin.which_key.mappings['a'] = { "<cmd>enew!<CR>", 'Add Buffer' }
+lvim.builtin.which_key.mappings['c'] = { "<cmd>BufferLinePickClose<CR>", 'Close Buffer' }
 -- lvim.builtin.which_key.mappings["t"] = {
 --   name = "+Trouble",
 --   r = { "<cmd>Trouble lsp_references<cr>", "References" },
@@ -62,6 +81,7 @@ lvim.builtin.notify.active = true
 lvim.builtin.terminal.active = true
 lvim.builtin.nvimtree.setup.view.side = "left"
 lvim.builtin.nvimtree.show_icons.git = 0
+lvim.builtin.terminal.shell = "/usr/bin/zsh"
 
 -- if you don't want all the parsers change this to a table of the ones you want
 lvim.builtin.treesitter.ensure_installed = {
