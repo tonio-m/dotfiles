@@ -2,12 +2,12 @@
 [[ $- != *i* ]] && return
 
 # keyboard layout
-setxkbmap -variant altgr-intl
+setxkbmap -layout us -variant mac -option "terminate:ctrl_alt_bksp"
 
 # path variable
-PATH="$HOME/.local/bin/:$PATH"
 PATH="$HOME/.cargo/bin:$PATH"
 PATH="/opt/resolve/bin:$PATH"
+PATH="$HOME/.local/bin/:$PATH"
 PATH="$HOME/.pyenv/bin/:$PATH"
 PATH="/home/user/repos/musicnn-cpp/essentia/src/essentia:$PATH"
 export PATH
@@ -17,12 +17,12 @@ source ~/.config/scripts/minimal.zsh
 
 # pyenv
 eval "$(pyenv init -)"
-eval "$(pyenv virtualenv-init -)"
 
 # aliases
+alias k='kubectl'
 alias vim=lvim
 alias ls="ls --color=auto --hide='Bitwig Studio' --hide='Documents'"
-alias k='kubectl'
+alias virt-manager="sudo GTK_THEME=Adwaita:dark virt-manager"
 
 # env vars
 export TERM="xterm-256color"

@@ -37,6 +37,10 @@ vim.cmd([[
 ]])
 
 vim.cmd([[
+  vnoremap * y/\V<C-R>=escape(@",'/\')<CR><CR>
+]])
+
+vim.cmd([[
   set foldmethod=indent
 ]])
 
