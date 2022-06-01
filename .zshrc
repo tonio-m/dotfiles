@@ -21,8 +21,9 @@ eval "$(pyenv init -)"
 # aliases
 alias k='kubectl'
 alias vim=lvim
-alias ls="ls --color=auto --hide='Bitwig Studio' --hide='Documents'"
+alias ls="ls --color=auto --hide='Bitwig Studio' --hide='Desktop' --hide='Documents'"
 alias virt-manager="sudo GTK_THEME=Adwaita:dark virt-manager"
+alias neofetch="neofetch --ascii $HOME/.config/scripts/maquinatotal.txt"
 
 # env vars
 export TERM="xterm-256color"

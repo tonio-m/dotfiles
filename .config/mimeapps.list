@@ -1,0 +1,7 @@
+[Added Associations]
+application/toml=micro.desktop;nvim.desktop;
+video/mp4=mpv.desktop;
+image/gif=mpv.desktop;
+image/png=sxiv.desktop;
+image/jpg=sxiv.desktop;
+image/jpeg=sxiv.desktop;
