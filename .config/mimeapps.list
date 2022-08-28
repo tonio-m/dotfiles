@@ -1,7 +1,21 @@
 [Added Associations]
 application/toml=micro.desktop;nvim.desktop;
 video/mp4=mpv.desktop;
-image/gif=mpv.desktop;
+image/gif=mpv.desktop;sxiv.desktop;
 image/png=sxiv.desktop;
 image/jpg=sxiv.desktop;
 image/jpeg=sxiv.desktop;
+audio/x-wav=mpv.desktop;wine-extension-htm.desktop;
+inode/directory=org.gnome.Nautilus.desktop;
+application/pdf=firefox.desktop;
+video/webm=mpv.desktop;
+text/plain=nvim.desktop;
+video/quicktime=mpv.desktop;
+video/x-matroska=mpv.desktop;
+
+[Default Applications]
+video/mp4=mpv.desktop
+video/x-matroska=mpv.desktop
+image/gif=mpv.desktop
+x-scheme-handler/lens=OpenLens.desktop
+x-scheme-handler/figma=figma-linux.desktop

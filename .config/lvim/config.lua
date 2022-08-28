@@ -14,6 +14,10 @@ lvim.format_on_save = true
 lvim.colorscheme = "onedarker"
 vim.opt.shell = "/usr/bin/zsh"
 
+vim.opt.foldmethod = "expr"
+-- vim.opt["foldenable"] = false
+vim.opt.foldexpr = "nvim_treesitter#foldexpr()"
+vim.opt.foldlevel = 99
 
 -- keymappings [view all the defaults by pressing <leader>Lk]
 lvim.leader = "space"
@@ -41,7 +45,7 @@ vim.cmd([[
 ]])
 
 vim.cmd([[
-  set foldmethod=indent
+  nnoremap <c-z> undo
 ]])
 
 
