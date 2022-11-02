@@ -86,7 +86,7 @@ function move_audios() {
   mv *.flac ~/Music/audios/
 }
 
-# intuition machines stuff 
+# utils 
 
 function kportforwarddask(){
   kubectl port-forward --namespace dask service/$@ 8787:8787
