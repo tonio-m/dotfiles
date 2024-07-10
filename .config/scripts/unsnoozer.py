@@ -1,6 +1,5 @@
 #!/usr/bin/python3
 # 0 9 * * * /usr/bin/python3 $HOME/.config/scripts/unsnoozer.py >> $HOME/.config/scripts/unsnoozer.log 2>&1
-import pd
 import os
 from datetime import datetime, timedelta
 import logging
