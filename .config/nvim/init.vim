@@ -10,6 +10,8 @@ require('onedark').setup()
 -- require'lspconfig'.pyright.setup{}
 EOF
 
+let g:markdown_fenced_languages = ['json', 'python', 'html', 'javascript', 'bash']
+
 
 " EDITOR "
 syntax on
@@ -29,6 +31,7 @@ set relativenumber
 set foldmethod=indent
 set clipboard=unnamedplus
 set backspace=indent,eol,start
+set belloff
 
 hi Folded ctermbg=none
 hi Folded ctermfg=gray
@@ -55,16 +58,17 @@ au TermOpen * setlocal nonumber norelativenumber
 " commands "
 command Sterm :sp | :terminal
 command Vterm :vsp | :terminal
-command! -nargs=* Nn call Nn(<f-args>)
-command Vault :e ~/Obsidian/marco_vault/000_inbox/
 command -nargs=1 SetTabSize call SetTabSize(<f-args>)
 " command! -nargs=1 SaveBuffers call SaveBuffers(<f-args>) "
-command! In execute 'cd $HOME/obsidian/marco_vault | Explore ./000_inbox/'
-command! Va execute 'cd $HOME/obsidian/marco_vault | Explore ./003_vault/'
-command! Jo execute 'cd $HOME/obsidian/marco_vault | Explore ./001_journal/'
-command! -nargs=? Wn execute 'lcd $HOME/obsidian/marco_vault | call s:OpenOrCreateJournal(<f-args>)'
+
+command! -nargs=* Nn call Nn(<f-args>)
+command! In execute 'Explore $HOME/Obsidian/marco_vault/000_inbox/'
+command! Va execute 'Explore $HOME/Obsidian/marco_vault/003_vault/'
+command! Jo execute 'Explore $HOME/Obsidian/marco_vault/001_journal/'
+command! -nargs=? Wn call OpenOrCreateJournal(<f-args>)
 command -range SortByWidth :<line1>,<line2>! awk '{ print length(), $0 | "sort -n | cut -d\\  -f2-" }'
-command! Dn execute "lcd $HOME/obsidian/marco_vault | edit 001_journal/" . strftime("%Y-%m-%d") . ".md"
+command! Dn execute "edit $HOME/Obsidian/marco_vault/001_journal/" . strftime("%Y-%m-%d") . ".md"
+command! Cd execute "cd $HOME/Obsidian/marco_vault/"
 
 " functions "
 function SetTabSize(n)
@@ -74,17 +78,16 @@ function SetTabSize(n)
 endfunction
 
 function! Nn(...)
-  execute 'cd $HOME/Obsidian/marco_vault/000_inbox/'
   let current_time = strftime("%Y-%m-%dT%H:%M:%S%z")
   if a:0 == 0
-    execute 'edit '.current_time.'.md'
+    execute 'edit $HOME/Obsidian/marco_vault/000_inbox/'.current_time.'.md'
   else
     let filename = join(a:000, ' ').'.md'
-    execute 'edit '.filename
+    execute 'edit $HOME/Obsidian/marco_vault/000_inbox/'.filename
   endif
 endfunction
 
-function! s:OpenOrCreateJournal(...) abort
+function! OpenOrCreateJournal(...) abort
   let l:offset = a:0 > 0 ? a:1 : 0
   let l:week_num = strftime('%V') + l:offset
   let l:year = strftime('%Y')
@@ -95,7 +98,7 @@ function! s:OpenOrCreateJournal(...) abort
     let l:week_num = l:week_num - 52
     let l:year = l:year + 1
   endif
-  let l:filename = '001_journal/' . l:year . '-W' . printf('%02d', l:week_num) . '.md'
+  let l:filename = '/Users/user/Obsidian/marco_vault/001_journal/' . l:year . '-W' . printf('%02d', l:week_num) . '.md'
   if !filereadable(l:filename)
     call writefile([
           \ 'sun:',

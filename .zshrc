@@ -80,3 +80,7 @@ sat:
 """ | vim -c "file ${file}" -
     fi
 }
+
+alias apa="export AWS_PROFILE=amherst"
+alias s3r="aws s3 ls --recursive --human-readable"
+alias s3="aws s3 ls --human-readable"
