@@ -37,7 +37,6 @@ ctrl + alt - r : yabai --restart-service
 
 # shift + alt - p : osascript ~/.config/skhd/simple.workflow
 shift + alt - o : osascript ~/.config/skhd/password.workflow
-ctrl + shift + alt - o: osascript ~/.config/skhd/type_clipboard.workflow
 
 ctrl - i: open -a Mission\ Control
-
+# ctrl + shift + alt - o: yabai -m window $(yabai -m query --windows | jq '.[] | select(.app == "Obsidian") | .id') --space $(yabai -m query --spaces --space | jq '.index')

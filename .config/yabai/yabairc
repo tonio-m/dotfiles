@@ -27,7 +27,7 @@ yabai -m mouse_drop_action swap
 yabai -m rule --add app="^System Settings$" manage=off
 yabai -m rule --add app="^Calculator$" manage=off
 yabai -m rule --add app="^Karabiner-Elements$" manage=off
-yabai -m rule --add app="^Microsoft Teams$" manage=off
-yabai -m rule --add app="^Microsoft Teams (work or school)$" manage=off
-yabai -m rule --add app="^Microsoft Teams Classic$" manage=off
-yabai -m rule --add app="^Microsoft Remote Desktop$" manage=off
+# yabai -m rule --add app="^Microsoft Teams$" manage=off
+# yabai -m rule --add app="^Microsoft Teams (work or school)$" manage=off
+# yabai -m rule --add app="^Microsoft Teams Classic$" manage=off
+# yabai -m rule --add app="^Microsoft Remote Desktop$" manage=off
