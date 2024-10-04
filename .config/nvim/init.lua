@@ -28,14 +28,15 @@ vim.o.smartcase = true
 vim.o.swapfile = false
 vim.o.ignorecase = true
 vim.g.netrw_liststyle = 3
-vim.o.foldmethod = 'indent'
+-- vim.o.foldmethod = 'indent'
 -- vim.o.foldmethod = 'syntax'
 vim.o.relativenumber = true
 vim.g.netrw_maxfilenamelen = 66
 vim.o.backspace = 'indent,eol,start'
 vim.opt.clipboard:append('unnamedplus')
 vim.g.calendar_action = 'CalendarFunction'
-vim.g.markdown_fenced_languages = {'json', 'python', 'html', 'javascript', 'bash', 'sql', 'cpp'}
+vim.g.markdown_fenced_languages = {'json', 'python', 'html', 'javascript', 'bash', 'sql', 'cpp', 'lua'}
+vim.cmd('syntax sync minlines=10000')
 
 
 -- vim.keymap.set('n', '<leader>wn', ':Wn<CR>', { noremap = true, silent = true })
@@ -68,11 +69,14 @@ vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { noremap = true, silent = true
 vim.keymap.set('n', '<leader>e', ':NvimTreeToggle<CR>', { noremap = true, silent = true })
 vim.keymap.set('n', '<leader>fg', ':Telescope live_grep<CR>', { noremap = true, silent = true })
 vim.keymap.set('n', '<leader>df', ':Df<CR>', { noremap = true, silent = true })
-vim.keymap.set('n', '<leader>Rf', ':Rf ', { noremap = true, silent = true })
+vim.keymap.set('n', '<leader>rf', ':Rf<CR>', { noremap = true, silent = true })
 vim.keymap.set('v', '*', 'y/\\V<C-R>=escape(@",\'/\\\')<CR><CR>', { noremap = true, silent = false })
 
 -- gobllm.nvim
-vim.keymap.set("n", "<leader>g", gobllm.complete, {noremap = true, silent=false})
+vim.keymap.set("n", "<leader>gg", gobllm.complete, {noremap = true, silent=false})
+vim.keymap.set("n", "<leader>gc", gobllm.chat, {noremap = true, silent=false})
+vim.keymap.set("n", "<leader>go", gobllm.open_chat_buffer, {noremap = true, silent=false})
+
 
 -- calendar stuff
 vim.keymap.set('n', '<leader>cal', ':CalendarVR<CR>:vertical resize 30<CR>', { noremap = true, silent = true })
