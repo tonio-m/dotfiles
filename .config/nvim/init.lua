@@ -49,7 +49,7 @@ vim.keymap.set('n', '<C-j>', '<C-w>j', { noremap = true, silent = true })
 vim.keymap.set('n', '<C-k>', '<C-w>k', { noremap = true, silent = true })
 vim.keymap.set('n', '<C-l>', '<C-w>l', { noremap = true, silent = true })
 vim.keymap.set('n', '<leader>q', ':q<CR>', { noremap = true, silent = true })
-vim.keymap.set('n', '<leader>x', ':q!<CR>', { noremap = true, silent = true })
+vim.keymap.set('n', '<leader>x', ':execute "silent! bwipeout!"<CR>', { noremap = true, silent = true })
 vim.keymap.set('n', '<leader>w', ':w<CR>', { noremap = true, silent = true })
 vim.keymap.set('n', '<leader>dd', ':D<CR>', { noremap = true, silent = true })
 vim.keymap.set('n', '<leader>bb', ':b#<CR>', { noremap = true, silent = true })
@@ -76,7 +76,6 @@ vim.keymap.set('v', '*', 'y/\\V<C-R>=escape(@",\'/\\\')<CR><CR>', { noremap = tr
 vim.keymap.set("n", "<leader>gg", gobllm.complete, {noremap = true, silent=false})
 vim.keymap.set("n", "<leader>gc", gobllm.chat, {noremap = true, silent=false})
 vim.keymap.set("n", "<leader>go", gobllm.open_chat_buffer, {noremap = true, silent=false})
-
 
 -- calendar stuff
 vim.keymap.set('n', '<leader>cal', ':CalendarVR<CR>:vertical resize 30<CR>', { noremap = true, silent = true })
