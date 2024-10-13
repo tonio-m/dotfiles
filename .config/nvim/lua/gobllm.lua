@@ -23,6 +23,23 @@ including correct spacing and indentation. Include the answer inside a <COMPLETI
 All completions MUST be truthful, accurate, well-written and correct. Think step by step.
 ]]
 
+
+local log_level = {
+    DEBUG = "DEBUG",
+    INFO = "INFO",
+    WARN = "WARN",
+    ERROR = "ERROR"
+}
+local log_file = vim.fn.stdpath('data') .. '/gobllm.log'
+
+function M.log_message(message, level)
+    level = level or log_level.INFO
+    local log_entry = string.format("%s [%s] %s\n", os.date("%Y-%m-%d %H:%M:%S"), level, message)
+    local file = assert(vim.loop.fs_open(log_file, "a", 438)) -- 438 is octal for 0666 permissions
+    vim.loop.fs_write(file, log_entry, -1)
+    vim.loop.fs_close(file)
+end
+
 function M.split_into_lines(str)
     local lines = {}
     for line in str:gmatch("([^\r\n]*)\r?\n?") do
@@ -47,37 +64,59 @@ function M.complete()
 end
 
 function M.chat()
+    M.log_message("Preparing to start chat...")
     local current_buffer = vim.fn.bufnr('%')
     local buffer_str = table.concat(vim.api.nvim_buf_get_lines(current_buffer, 0, -1, false),"\n")
+
+    M.log_message("Parsing chat buffer...")
     local messages = M.parse_chat(buffer_str)
+
     for i, message in ipairs(messages) do
         if message.role == "user" then
             local expanded_text = M.replace_file_links(messages[i].content)
             messages[i].content = expanded_text
         end
     end
+
     table.insert(messages,1,{role = "system", content = CHAT_SYSTEM_PROMPT})
+
+    M.log_message("Requesting answer from LLM...")
+    M.log_message("messages: " .. vim.inspect(messages), log_level.DEBUG)
     local answer = M.completion_request(messages)
     local line_count = vim.api.nvim_buf_line_count(current_buffer)
     vim.api.nvim_buf_set_lines(current_buffer, line_count, line_count, false, M.split_into_lines("### A:\n" .. answer .. "\n### Q:"))
+    M.log_message("Chat Completion successful.")
 end
 
 function M.read_file(filepath)
-    local file = io.open(filepath, "r")
+    local current_dir = io.popen("pwd"):read("*l")
+    local full_path = current_dir .. "/" .. filepath
+    local file = io.open(full_path, "r")
+    M.log_message("reading file... " .. full_path)
     if not file then
-        return nil, "Could not open file: " .. filepath
+        error("File not found: " .. full_path)
     end
     local content = file:read("*all")
     file:close()
+    M.log_message("File read successfully.")
     return content
 end
 
 function M.replace_file_links(text)
+    M.log_message("Replacing file links in user messages...")
+
     local result = "\n" .. text
     for match in result:gmatch("\n<[^>]+>") do
         local filepath = match:sub(3, -2)
         local file_contents = M.read_file(filepath)
-        result = result:gsub(match, "\n```".. filepath .."\n".. file_contents .. "```")
+        M.log_message("file_contents: " .. file_contents, log_level.DEBUG)
+        if file_contents == nil then
+            M.log_message("Failed to replace file link, file not accessible: " .. filepath, log_level.WARN)
+        end
+
+        local escaped_match = match:gsub("([%^%$%(%)%%%.%[%]%*%+%-%?])", "%%%1")
+        result = result:gsub(escaped_match, "\n```".. filepath .."\n".. file_contents .. "```")
+        M.log_message("doing replacement... result = " .. result, log_level.DEBUG)
     end
     return result
 end
