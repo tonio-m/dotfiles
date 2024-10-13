@@ -23,22 +23,6 @@ eval "$(pyenv init -)"
 alias vim=nvim
 # alias k=kubectl
 alias make=gmake
-# alias i="cd $HOME/Obsidian/marco_vault/000_inbox/ && vim -c ':Explore .'"
-# alias v="cd $HOME/Obsidian/marco_vault/003_vault/ && vim -c ':Explore .'"
-
-# dn() {
-#     local offset=${1:--0} #default for $1 is -0
-#     vim "$HOME/Obsidian/marco_vault/001_journal/$(date -v${offset}d +"%Y-%m-%d").md"
-# }
-
-# nn() {
-#     cd "$HOME/Obsidian/marco_vault/000_inbox/"
-#     if [ $# -eq 0 ]; then
-#       vim "$(date +"%Y-%m-%dT%H:%M:%S%z").md"
-#     else
-#       vim "$*.md"
-#     fi
-# }
 
 add_worktree() {
     if [ -z "$1" ]; then
@@ -57,42 +41,11 @@ add_worktree() {
     cd ../${branch_name}
 }
 
-
 gh_switch() {
     gh auth switch
     git config --global user.name $(gh api user | jq -r '.login')
     git config --global user.email $(gh api user/emails | jq -r '.[0].email')
 }
-
-# week() {
-#     cd $HOME/Obsidian/marco_vault
-#     local file="001_journal/$(date +%Y-W%V).md"
-#     if [ -e ${file} ]; then
-#         vim ${file}
-#     else
-#         echo """sun:
-# [[001_journal/$(date -vsun +"%Y-%m-%d").md]]
-# 
-# mon: 
-# [[001_journal/$(date -vmon +"%Y-%m-%d").md]]
-# 
-# tue:
-# [[001_journal/$(date -vtue +"%Y-%m-%d").md]]
-# 
-# wed:
-# [[001_journal/$(date -vwed +"%Y-%m-%d").md]]
-# 
-# thu:
-# [[001_journal/$(date -vthu +"%Y-%m-%d").md]]
-# 
-# fri:
-# [[001_journal/$(date -vfri +"%Y-%m-%d").md]]
-# 
-# sat:
-# [[001_journal/$(date -vsat +"%Y-%m-%d").md]]
-# """ | vim -c "file ${file}" -
-#     fi
-# }
 
 # c() {
 #   local content="$*"
