@@ -57,6 +57,13 @@ add_worktree() {
     cd ../${branch_name}
 }
 
+
+gh_switch() {
+    gh auth switch
+    git config --global user.name $(gh api user | jq -r '.login')
+    git config --global user.email $(gh api user/emails | jq -r '.[0].email')
+}
+
 # week() {
 #     cd $HOME/Obsidian/marco_vault
 #     local file="001_journal/$(date +%Y-W%V).md"
