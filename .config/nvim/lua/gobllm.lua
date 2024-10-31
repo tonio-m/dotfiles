@@ -84,14 +84,16 @@ function M.replace_file_links(text)
 
         local filepath = match:sub(4, -2)
         local file_contents = M.read_file(filepath)
-        M.log_message("file_contents: " .. file_contents, log_level.DEBUG)
+        M.log_message("file_contents: " .. string.gsub(file_contents, "\n", "\\n"):sub(1, 50), log_level.DEBUG)
+
         if file_contents == nil then
             M.log_message("Failed to replace file link, file not accessible: " .. filepath, log_level.WARN)
         end
 
         local escaped_match = match:gsub("([%^%$%(%)%%%.%[%]%*%+%-%?])", "%%%1")
         result = result:gsub(escaped_match, "\n```".. filepath .."\n".. file_contents .. "```")
-        M.log_message("doing replacement of file links... result = " .. result, log_level.DEBUG)
+        M.log_message("doing replacement of file links... ", log_level.DEBUG)
+        -- M.log_message("doing replacement of file links... result = " .. result, log_level.DEBUG)
     end
     return result
 end
