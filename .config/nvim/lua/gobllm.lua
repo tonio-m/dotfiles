@@ -12,7 +12,6 @@ Make sure to include the programming language name at the start of the Markdown 
 Avoid wrapping the whole response in triple backticks. The user works in an IDE called Neovim. 
 You can only give one reply for each conversation turn.
 ]]
-local USER_COMPLETION_MARKER = "<"..">"
 local INTERNAL_COMPLETION_MARKER = "{{" .. "FILL HERE" .. "}}"
 local COMPLETE_SYSTEM_PROMPT = [[
 You're a code completion assistant. 
@@ -23,13 +22,16 @@ including correct spacing and indentation. Include the answer inside a <COMPLETI
 All completions MUST be truthful, accurate, well-written and correct. Think step by step.
 ]]
 local COMPLETE_REPLACE_SYSTEM_PROMPT = [[
-You're a code completion assistant. 
-You're an expert in generating blocks of code.
-You are provided with a block of code inside backticks and a specific task'. 
-Rewrite the block according to the instructions of the task.
-Write ONLY the needed code to replace the block with the correct alternative, 
-including correct spacing and indentation. 
-All completions MUST be truthful, accurate, well-written and correct. Think step by step.
+You're a specialized code completion assistant with expertise in all programming languages. 
+When given a code block and modification instructions:
+1. Output ONLY the modified code with proper indentation and spacing
+2. Do not include backticks, comments about the changes, or any non-code text
+3. Maintain the original code's language and style conventions
+4. Preserve any language-specific formatting requirements
+5. Handle any programming language without changing the input language
+6. Do not add explanatory text before or after the code
+7. Think through the changes step by step before outputting
+8. Ensure the output is complete, accurate, and production-ready
 ]]
 
 local log_level = {
@@ -38,7 +40,7 @@ local log_level = {
     WARN = "WARN",
     ERROR = "ERROR"
 }
-local log_file = vim.fn.stdpath('data') .. '/gobllm.log'
+local log_file = '/tmp/gobllm.log'
 
 function M.open_chat_buffer()
   vim.cmd("enew")
@@ -102,6 +104,7 @@ function M.parse_chat(text)
     local messages= {}
     local content = ""
     local role = nil
+
     local lines = M.split_into_lines(text)
     for i, line in ipairs(lines) do
         if (line:match("^### Q:%s*") or  line:match("^### A:%s*") or i  == #lines) and i ~= 1 then
@@ -119,7 +122,6 @@ function M.parse_chat(text)
     return messages
 end
 
--- TODO: make this (anthropic/openai) switchable like it was before
 function M.completion_request_openai(messages,system_prompt)
     table.insert(messages, 1, {
         role = "system",
@@ -170,6 +172,16 @@ function M.completion_request_anthropic(messages,system_prompt)
     return answer
 end
 
+function M.completion_request(messages, system_prompt)
+    if M.config.provider == "openai" then
+        return M.completion_request_openai(messages, system_prompt)
+    elseif M.config.provider == "anthropic" then
+        return M.completion_request_anthropic(messages, system_prompt)
+    else
+        error("Invalid provider specified. Must be 'openai' or 'anthropic'")
+    end
+end
+
 function M.chat()
     M.log_message("Preparing to start chat...")
     local current_buffer = vim.fn.bufnr('%')
@@ -187,7 +199,7 @@ function M.chat()
 
     M.log_message("Requesting answer from LLM...")
     M.log_message("messages: " .. vim.inspect(messages), log_level.DEBUG)
-    local answer = M.completion_request_anthropic(messages,CHAT_SYSTEM_PROMPT)
+    local answer = M.completion_request(messages,CHAT_SYSTEM_PROMPT)
     local line_count = vim.api.nvim_buf_line_count(current_buffer)
     vim.api.nvim_buf_set_lines(current_buffer, line_count, line_count, false, M.split_into_lines("### A:\n" .. answer .. "\n### Q:"))
     M.log_message("Chat Completion successful.")
@@ -196,11 +208,11 @@ end
 function M.complete()
     local current_buffer = vim.fn.bufnr('%')
     local buffer_str = table.concat(vim.api.nvim_buf_get_lines(current_buffer, 0, -1, false),"\n")
-    buffer_str = buffer_str:gsub(USER_COMPLETION_MARKER, INTERNAL_COMPLETION_MARKER)
+    buffer_str = buffer_str:gsub(M.config.user_completion_marker, INTERNAL_COMPLETION_MARKER)
     local messages = {
         {role = "user", content = buffer_str}
     }
-    local completion = M.completion_request_anthropic(messages,COMPLETE_SYSTEM_PROMPT)
+    local completion = M.completion_request(messages,COMPLETE_SYSTEM_PROMPT)
     completion = completion:gsub("<COMPLETION>","")
     completion = completion:gsub("</COMPLETION>","")
     buffer_str = buffer_str:gsub(INTERNAL_COMPLETION_MARKER, completion)
@@ -220,13 +232,11 @@ function M.replace(opts)
     end
     local code_block = table.concat(lines,"\n")
     M.log_message("Values passed: " .. code_block .. ", " .. task)
-
     local messages = {
         {role = "user", content = "```\n" .. code_block .. "\n```\n\n" .. task}
     }
-    local completion = M.completion_request_anthropic(messages,COMPLETE_REPLACE_SYSTEM_PROMPT)
-    completion = completion:gsub("```\n","")
-    completion = completion:gsub("\n```","")
+   local completion = M.completion_request_anthropic(messages,COMPLETE_REPLACE_SYSTEM_PROMPT)
+
     -- set the lines to be those of completion
     local current_buffer = vim.fn.bufnr('%')
     vim.api.nvim_buf_set_lines(current_buffer, start_line - 1, end_line, false, M.split_into_lines(completion))
@@ -234,18 +244,35 @@ function M.replace(opts)
 end
 
 function M.setup(opts)
-	M.config= {
-		-- model = "gpt-4o",
-		-- api_key_name = "OPENAI_API_KEY",
-		-- url = "https://api.openai.com/v1/chat/completions",
-		api_key_name = "ANTHROPIC_API_KEY",
-		model = "claude-3-5-sonnet-20241022",
+    -- Default configuration
+    M.config = {
+        -- Choose your AI provider and model
+        provider = "anthropic", -- or "openai"
+        -- API configuration
+        api_key_name = "ANTHROPIC_API_KEY",
+        model = "claude-3-5-sonnet-20241022",
         url = "https://api.anthropic.com/v1/messages",
-	}
-    for key, value in pairs(opts) do
-      M.config[key] = value
+        user_completion_marker = "<" .. ">",
+        -- OpenAI defaults (uncomment to use)
+        -- provider = "openai",
+        -- api_key_name = "OPENAI_API_KEY",
+        -- model = "gpt-4",
+        -- url = "https://api.openai.com/v1/chat/completions",
+    }
+
+    -- Override defaults with user options
+    if opts then
+        for key, value in pairs(opts) do
+            M.config[key] = value
+        end
     end
+
+    -- Get API key from environment variable
     M.config.api_key = os.getenv(M.config.api_key_name)
+    -- Validate API key
+    if not M.config.api_key then
+        error(string.format("Missing API key: Please set the %s environment variable", M.config.api_key_name))
+    end
 end
 
 return M
