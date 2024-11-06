@@ -73,9 +73,9 @@ vim.keymap.set('n', '<leader>rf', ':Rf<CR>', { noremap = true, silent = false })
 vim.keymap.set('v', '*', 'y/\\V<C-R>=escape(@",\'/\\\')<CR><CR>', { noremap = true, silent = false })
 
 -- gobllm.nvim
-vim.keymap.set("n", "<leader>gg", gobllm.complete, {noremap = true, silent=false})
+vim.keymap.set("n", "<leader>gg", gobllm.fill , {noremap = true, silent=false})
 vim.keymap.set("n", "<leader>gc", gobllm.chat, {noremap = true, silent=false})
-vim.keymap.set("n", "<leader>go", gobllm.open_chat_buffer, {noremap = true, silent=false})
+vim.keymap.set("n", "<leader>go", gobllm.open_chat, {noremap = true, silent=false})
 vim.api.nvim_create_user_command('GobllmReplace', gobllm.replace, { range = true, nargs = 1 })
 
 -- calendar stuff

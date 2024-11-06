@@ -42,13 +42,7 @@ local log_level = {
 }
 local log_file = '/tmp/gobllm.log'
 
-function M.open_chat_buffer()
-  vim.cmd("enew")
-  vim.cmd("set filetype=markdown")
-  vim.api.nvim_buf_set_lines(0, 0, 0, false, { "### Q:" })
-end
-
-function M.log_message(message, level)
+function log_message(message, level)
     level = level or log_level.INFO
     local log_entry = string.format("%s [%s] %s\n", os.date("%Y-%m-%d %H:%M:%S"), level, message)
     local file = assert(vim.loop.fs_open(log_file, "a", 438)) -- 438 is octal for 0666 permissions
@@ -56,7 +50,7 @@ function M.log_message(message, level)
     vim.loop.fs_close(file)
 end
 
-function M.split_into_lines(str)
+function split_into_lines(str)
     local lines = {}
     for line in str:gmatch("([^\r\n]*)\r?\n?") do
         table.insert(lines, line)
@@ -64,48 +58,48 @@ function M.split_into_lines(str)
     return lines
 end
 
-function M.read_file(filepath)
+function read_file(filepath)
     local current_dir = io.popen("pwd"):read("*l")
     local full_path = current_dir .. "/" .. filepath
     local file = io.open(full_path, "r")
-    M.log_message("reading file... " .. full_path)
+    log_message("reading file... " .. full_path)
     if not file then
         error("File not found: " .. full_path)
     end
     local content = file:read("*all")
     file:close()
-    M.log_message("File read successfully.")
+    log_message("File read successfully.")
     return content
 end
 
-function M.replace_file_links(text)
-    M.log_message("Replacing file links in user messages...")
+function replace_file_links(text)
+    log_message("Replacing file links in user messages...")
 
     local result = "\n" .. text
     for match in result:gmatch("\n!<[^>]+>") do
 
         local filepath = match:sub(4, -2)
-        local file_contents = M.read_file(filepath)
-        M.log_message("file_contents: " .. string.gsub(file_contents, "\n", "\\n"):sub(1, 50), log_level.DEBUG)
+        local file_contents = read_file(filepath)
+        log_message("file_contents: " .. string.gsub(file_contents, "\n", "\\n"):sub(1, 50), log_level.DEBUG)
 
         if file_contents == nil then
-            M.log_message("Failed to replace file link, file not accessible: " .. filepath, log_level.WARN)
+            log_message("Failed to replace file link, file not accessible: " .. filepath, log_level.WARN)
         end
 
         local escaped_match = match:gsub("([%^%$%(%)%%%.%[%]%*%+%-%?])", "%%%1")
         result = result:gsub(escaped_match, "\n```".. filepath .."\n".. file_contents .. "```")
-        M.log_message("doing replacement of file links... ", log_level.DEBUG)
-        -- M.log_message("doing replacement of file links... result = " .. result, log_level.DEBUG)
+        log_message("doing replacement of file links... ", log_level.DEBUG)
+        -- log_message("doing replacement of file links... result = " .. result, log_level.DEBUG)
     end
     return result
 end
 
-function M.parse_chat(text)
+function parse_chat(text)
     local messages= {}
     local content = ""
     local role = nil
 
-    local lines = M.split_into_lines(text)
+    local lines = split_into_lines(text)
     for i, line in ipairs(lines) do
         if (line:match("^### Q:%s*") or  line:match("^### A:%s*") or i  == #lines) and i ~= 1 then
             table.insert(messages,{role = role, content = content})
@@ -122,18 +116,18 @@ function M.parse_chat(text)
     return messages
 end
 
-function M.completion_request_openai(messages,system_prompt)
+function completion_request_openai(messages,system_prompt,config)
     table.insert(messages, 1, {
         role = "system",
         content = system_prompt
     })
-    local response = curl.post(M.config.url, {
+    local response = curl.post(config.url, {
         headers = {
             ["Content-Type"] = "application/json",
-            ["Authorization"] = "Bearer " .. M.config.api_key,
+            ["Authorization"] = "Bearer " .. config.api_key,
         },
         body = vim.fn.json_encode({
-            model = M.config.model,
+            model = config.model,
             messages = messages,
         }),
         timeout = 60000
@@ -148,17 +142,17 @@ function M.completion_request_openai(messages,system_prompt)
     return answer
 end
 
-function M.completion_request_anthropic(messages,system_prompt)
-    local response = curl.post(M.config.url, {
+function completion_request_anthropic(messages,system_prompt,config)
+    local response = curl.post(config.url, {
         headers = {
             ["Content-Type"] = "application/json",
             ["anthropic-version"] = "2023-06-01",
-            ["x-api-key"] = M.config.api_key,
+            ["x-api-key"] = config.api_key,
         },
         body = vim.fn.json_encode({
             system = system_prompt,
             messages = messages,
-            model = M.config.model,
+            model = config.model,
             max_tokens = 4000,
         }),
         timeout = 60000
@@ -172,55 +166,32 @@ function M.completion_request_anthropic(messages,system_prompt)
     return answer
 end
 
-function M.completion_request(messages, system_prompt)
+function completion_request(messages, system_prompt)
     if M.config.provider == "openai" then
-        return M.completion_request_openai(messages, system_prompt)
+        return completion_request_openai(messages, system_prompt,M.config)
     elseif M.config.provider == "anthropic" then
-        return M.completion_request_anthropic(messages, system_prompt)
+        return completion_request_anthropic(messages, system_prompt,M.config)
     else
         error("Invalid provider specified. Must be 'openai' or 'anthropic'")
     end
 end
 
-function M.chat()
-    M.log_message("Preparing to start chat...")
-    local current_buffer = vim.fn.bufnr('%')
-    local buffer_str = table.concat(vim.api.nvim_buf_get_lines(current_buffer, 0, -1, false),"\n")
-
-    M.log_message("Parsing chat buffer...")
-    local messages = M.parse_chat(buffer_str)
-
-    for i, message in ipairs(messages) do
-        if message.role == "user" then
-            local expanded_text = M.replace_file_links(messages[i].content)
-            messages[i].content = expanded_text
-        end
-    end
-
-    M.log_message("Requesting answer from LLM...")
-    M.log_message("messages: " .. vim.inspect(messages), log_level.DEBUG)
-    local answer = M.completion_request(messages,CHAT_SYSTEM_PROMPT)
-    local line_count = vim.api.nvim_buf_line_count(current_buffer)
-    vim.api.nvim_buf_set_lines(current_buffer, line_count, line_count, false, M.split_into_lines("### A:\n" .. answer .. "\n### Q:"))
-    M.log_message("Chat Completion successful.")
-end
-
-function M.complete()
+function M.fill()
     local current_buffer = vim.fn.bufnr('%')
     local buffer_str = table.concat(vim.api.nvim_buf_get_lines(current_buffer, 0, -1, false),"\n")
     buffer_str = buffer_str:gsub(M.config.user_completion_marker, INTERNAL_COMPLETION_MARKER)
     local messages = {
         {role = "user", content = buffer_str}
     }
-    local completion = M.completion_request(messages,COMPLETE_SYSTEM_PROMPT)
+    local completion = completion_request(messages,COMPLETE_SYSTEM_PROMPT)
     completion = completion:gsub("<COMPLETION>","")
     completion = completion:gsub("</COMPLETION>","")
     buffer_str = buffer_str:gsub(INTERNAL_COMPLETION_MARKER, completion)
-    vim.api.nvim_buf_set_lines(current_buffer, 0, -1, false, M.split_into_lines(buffer_str))
+    vim.api.nvim_buf_set_lines(current_buffer, 0, -1, false, split_into_lines(buffer_str))
 end
 
 function M.replace(opts)
-    M.log_message("Executing replace function...")
+    log_message("Executing replace function...")
     local task = opts.args
     local end_line = opts.line2
     local start_line = opts.line1
@@ -231,16 +202,45 @@ function M.replace(opts)
         table.insert(lines,text)
     end
     local code_block = table.concat(lines,"\n")
-    M.log_message("Values passed: " .. code_block .. ", " .. task)
+    log_message("Values passed: " .. code_block .. ", " .. task)
     local messages = {
         {role = "user", content = "```\n" .. code_block .. "\n```\n\n" .. task}
     }
-   local completion = M.completion_request_anthropic(messages,COMPLETE_REPLACE_SYSTEM_PROMPT)
+   local completion = completion_request(messages,COMPLETE_REPLACE_SYSTEM_PROMPT)
 
     -- set the lines to be those of completion
     local current_buffer = vim.fn.bufnr('%')
-    vim.api.nvim_buf_set_lines(current_buffer, start_line - 1, end_line, false, M.split_into_lines(completion))
-    M.log_message("Call of complete_replace sucessful.")
+    vim.api.nvim_buf_set_lines(current_buffer, start_line - 1, end_line, false, split_into_lines(completion))
+    log_message("Call of complete_replace sucessful.")
+end
+
+function M.chat()
+    log_message("Preparing to start chat...")
+    local current_buffer = vim.fn.bufnr('%')
+    local buffer_str = table.concat(vim.api.nvim_buf_get_lines(current_buffer, 0, -1, false),"\n")
+
+    log_message("Parsing chat buffer...")
+    local messages = parse_chat(buffer_str)
+
+    for i, message in ipairs(messages) do
+        if message.role == "user" then
+            local expanded_text = replace_file_links(messages[i].content)
+            messages[i].content = expanded_text
+        end
+    end
+
+    log_message("Requesting answer from LLM...")
+    log_message("messages: " .. vim.inspect(messages), log_level.DEBUG)
+    local answer = completion_request(messages,CHAT_SYSTEM_PROMPT)
+    local line_count = vim.api.nvim_buf_line_count(current_buffer)
+    vim.api.nvim_buf_set_lines(current_buffer, line_count, line_count, false, split_into_lines("### A:\n" .. answer .. "\n### Q:"))
+    log_message("Chat Completion successful.")
+end
+
+function M.open_chat()
+  vim.cmd("enew")
+  vim.cmd("set filetype=markdown")
+  vim.api.nvim_buf_set_lines(0, 0, 0, false, { "### Q:" })
 end
 
 function M.setup(opts)
