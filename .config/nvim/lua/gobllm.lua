@@ -3,7 +3,9 @@
 local M = {}
 local vim = vim or {}
 local curl = require('plenary.curl')
-local CHAT_SYSTEM_PROMPT = [[
+local INTERNAL_FILL_MARKER = "{{" .. "FILL HERE" .. "}}"
+
+local CHAT_CODING_ASSISTANT_SYSTEM_PROMPT = [[
 You are an AI programming assistant. Follow the user's requirements carefully & to the letter. 
 You are an expert on software development. Keep your answers short and impersonal. 
 First think step-by-step. Then output the code in a single code block. Minimize any other prose. 
@@ -12,16 +14,36 @@ Make sure to include the programming language name at the start of the Markdown 
 Avoid wrapping the whole response in triple backticks. The user works in an IDE called Neovim. 
 You can only give one reply for each conversation turn.
 ]]
-local INTERNAL_COMPLETION_MARKER = "{{" .. "FILL HERE" .. "}}"
-local COMPLETE_SYSTEM_PROMPT = [[
+local CHAT_GENERAL_HELPER_SYSTEM_PROMPT = [[
+You are a helpful, knowledgeable assistant focused on supporting users with any task or question. 
+
+Key guidelines:
+- Provide clear, direct answers without unnecessary caveats
+- Break down complex problems step by step
+- Be concise for simple questions, thorough for complex ones
+- Use appropriate formatting (bullet points, numbered lists, etc.) for clarity 
+- Include relevant examples when helpful
+- State limitations of knowledge when applicable
+- Ask clarifying questions only when truly needed
+- Maintain a warm, professional tone without being overly casual
+
+When handling requests:
+1. First understand the core need/question
+2. Consider the most effective way to structure the response
+3. Provide the answer/solution
+4. Offer to elaborate only if additional detail would be genuinely helpful
+
+Your responses should be practical and actionable while avoiding unnecessary length or repetition.
+]]
+local FILL_SYSTEM_PROMPT = [[
 You're a code completion assistant. 
 You're an expert in generating blocks of code.
-You are provided with a file containing holes, formatted as ']] .. INTERNAL_COMPLETION_MARKER .. [['. 
-Write ONLY the needed text to replace ]] .. INTERNAL_COMPLETION_MARKER ..[[ with the correct completion, 
+You are provided with a file containing holes, formatted as ']] .. INTERNAL_FILL_MARKER .. [['. 
+Write ONLY the needed text to replace ]] .. INTERNAL_FILL_MARKER ..[[ with the correct completion, 
 including correct spacing and indentation. Include the answer inside a <COMPLETION></COMPLETION> tag.
 All completions MUST be truthful, accurate, well-written and correct. Think step by step.
 ]]
-local COMPLETE_REPLACE_SYSTEM_PROMPT = [[
+local REPLACE_SYSTEM_PROMPT = [[
 You're a specialized code completion assistant with expertise in all programming languages. 
 When given a code block and modification instructions:
 1. Output ONLY the modified code with proper indentation and spacing
@@ -179,14 +201,14 @@ end
 function M.fill()
     local current_buffer = vim.fn.bufnr('%')
     local buffer_str = table.concat(vim.api.nvim_buf_get_lines(current_buffer, 0, -1, false),"\n")
-    buffer_str = buffer_str:gsub(M.config.user_completion_marker, INTERNAL_COMPLETION_MARKER)
+    buffer_str = buffer_str:gsub(M.config.fill_marker, INTERNAL_FILL_MARKER)
     local messages = {
         {role = "user", content = buffer_str}
     }
-    local completion = completion_request(messages,COMPLETE_SYSTEM_PROMPT)
+    local completion = completion_request(messages,FILL_SYSTEM_PROMPT)
     completion = completion:gsub("<COMPLETION>","")
     completion = completion:gsub("</COMPLETION>","")
-    buffer_str = buffer_str:gsub(INTERNAL_COMPLETION_MARKER, completion)
+    buffer_str = buffer_str:gsub(INTERNAL_FILL_MARKER, completion)
     vim.api.nvim_buf_set_lines(current_buffer, 0, -1, false, split_into_lines(buffer_str))
 end
 
@@ -206,7 +228,7 @@ function M.replace(opts)
     local messages = {
         {role = "user", content = "```\n" .. code_block .. "\n```\n\n" .. task}
     }
-   local completion = completion_request(messages,COMPLETE_REPLACE_SYSTEM_PROMPT)
+   local completion = completion_request(messages,REPLACE_SYSTEM_PROMPT)
 
     -- set the lines to be those of completion
     local current_buffer = vim.fn.bufnr('%')
@@ -214,28 +236,30 @@ function M.replace(opts)
     log_message("Call of complete_replace sucessful.")
 end
 
-function M.chat()
-    log_message("Preparing to start chat...")
-    local current_buffer = vim.fn.bufnr('%')
-    local buffer_str = table.concat(vim.api.nvim_buf_get_lines(current_buffer, 0, -1, false),"\n")
-
-    log_message("Parsing chat buffer...")
-    local messages = parse_chat(buffer_str)
-
-    for i, message in ipairs(messages) do
-        if message.role == "user" then
-            local expanded_text = replace_file_links(messages[i].content)
-            messages[i].content = expanded_text
+function chat_factory(system_prompt)
+    return function()
+        log_message("Preparing to start chat...")
+        local current_buffer = vim.fn.bufnr('%')
+        local buffer_str = table.concat(vim.api.nvim_buf_get_lines(current_buffer, 0, -1, false),"\n")
+        log_message("Parsing chat buffer...")
+        local messages = parse_chat(buffer_str)
+        for i, message in ipairs(messages) do
+            if message.role == "user" then
+                local expanded_text = replace_file_links(messages[i].content)
+                messages[i].content = expanded_text
+            end
         end
+        log_message("Requesting answer from LLM...")
+        log_message("messages: " .. vim.inspect(messages), log_level.DEBUG)
+        local answer = completion_request(messages,system_prompt)
+        local line_count = vim.api.nvim_buf_line_count(current_buffer)
+        vim.api.nvim_buf_set_lines(current_buffer, line_count, line_count, false, split_into_lines("### A:\n" .. answer .. "\n### Q:"))
+        log_message("Chat Completion successful.")
     end
-
-    log_message("Requesting answer from LLM...")
-    log_message("messages: " .. vim.inspect(messages), log_level.DEBUG)
-    local answer = completion_request(messages,CHAT_SYSTEM_PROMPT)
-    local line_count = vim.api.nvim_buf_line_count(current_buffer)
-    vim.api.nvim_buf_set_lines(current_buffer, line_count, line_count, false, split_into_lines("### A:\n" .. answer .. "\n### Q:"))
-    log_message("Chat Completion successful.")
 end
+
+M.chat_coding_assistant = chat_factory(CHAT_CODING_ASSISTANT_SYSTEM_PROMPT)
+M.chat_general_helper = chat_factory(CHAT_GENERAL_HELPER_SYSTEM_PROMPT)
 
 function M.open_chat()
   vim.cmd("enew")
@@ -250,9 +274,10 @@ function M.setup(opts)
         provider = "anthropic", -- or "openai"
         -- API configuration
         api_key_name = "ANTHROPIC_API_KEY",
-        model = "claude-3-5-sonnet-20241022",
+        model = "claude-3-5-sonnet-latest",
+        -- model = "claude-3-haiku-20240307",
         url = "https://api.anthropic.com/v1/messages",
-        user_completion_marker = "<" .. ">",
+        fill_marker = "<" .. ">",
         -- OpenAI defaults (uncomment to use)
         -- provider = "openai",
         -- api_key_name = "OPENAI_API_KEY",

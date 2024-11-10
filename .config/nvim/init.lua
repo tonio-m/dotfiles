@@ -74,7 +74,8 @@ vim.keymap.set('v', '*', 'y/\\V<C-R>=escape(@",\'/\\\')<CR><CR>', { noremap = tr
 
 -- gobllm.nvim
 vim.keymap.set("n", "<leader>gg", gobllm.fill , {noremap = true, silent=false})
-vim.keymap.set("n", "<leader>gc", gobllm.chat, {noremap = true, silent=false})
+vim.keymap.set("n", "<leader>gc", gobllm.chat_coding_assistant, {noremap = true, silent=false})
+vim.keymap.set("n", "<leader>gh", gobllm.chat_general_helper, {noremap = true, silent=false})
 vim.keymap.set("n", "<leader>go", gobllm.open_chat, {noremap = true, silent=false})
 vim.api.nvim_create_user_command('GobllmReplace', gobllm.replace, { range = true, nargs = 1 })
 
@@ -97,3 +98,4 @@ vim.api.nvim_create_autocmd('FileType', {
         vim.api.nvim_buf_set_keymap(0, 'n', '<C-l>', '<C-w>l', { noremap = true, silent = false })
     end,
 })
+
