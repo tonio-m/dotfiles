@@ -7,7 +7,6 @@ function open_inbox()
     vim.cmd("NvimTreeOpen " .. INBOX_FOLDER)
 end
 
-function change_dir() vim.cmd("cd " .. OBSIDIAN_HOME) end
 function vault_folder() vim.cmd("NvimTreeOpen " .. VAULT_FOLDER) end
 function journal_folder() vim.cmd("NvimTreeOpen " .. JOURNAL_FOLDER) end
 function daily_note() vim.cmd("edit " .. JOURNAL_FOLDER .. os.date("%Y-%m-%d") .. '.md') end
@@ -21,17 +20,6 @@ function vault_file()
   os.rename(current_file, target_file)
   vim.api.nvim_command('e ' .. target_file)
   vim.api.nvim_command('bwipeout! #')
-end
-
-function delete_file()
-  local current_file = vim.api.nvim_buf_get_name(0)
-  if vim.fn.confirm("Are you sure you want to delete " .. current_file .. "?", "&y\n&N", 2) == 1 then
-    os.remove(current_file)
-    -- vim.api.nvim_command('bwipeout!')
-    print(current_file .. " has been deleted")
-  else
-    print("File deletion cancelled")
-  end
 end
 
 function sort_by_width(opts)
@@ -48,29 +36,6 @@ function list_files_in_directory(directory)
     table.insert(files, file)
   end
   return files
-end
-
-function rename_file()
-  local input_opts = {
-    prompt = 'New name: ',
-    default = '',
-    completion = nil,
-  }
-
-  vim.ui.input(input_opts, function(input)
-    if input == nil or input == '' then
-      print('No name was provided to rename file')
-      return
-    end
-
-    local current_file = vim.api.nvim_buf_get_name(0)
-    local path_only = vim.fn.fnamemodify(current_file, ":h")
-    local target_file = path_only .. "/" .. input .. ".md"
-    vim.notify(target_file)
-    os.rename(current_file, target_file)
-    vim.api.nvim_command('e ' .. target_file)
-    vim.api.nvim_command('bwipeout! #')
-  end)
 end
 
 function new_note(params)
@@ -91,12 +56,13 @@ function deque_inbox()
     end
 end
 
+
+-- calendar stuff
 function calendar_function(day,month,year,week,dir)
     local date = os.time{year=year, month=month, day=day}
     vim.cmd("vsplit " .. JOURNAL_FOLDER .. os.date("%Y-%m-%d", date) .. '.md')
 end
-
--- declare bridging vimscript function to use on calendar-vim plugin
+-- vimscript bridge function to use on plugin config
 vim.cmd([[
   function! CalendarFunction(day,month,year,week,dir)
     lua calendar_function(
