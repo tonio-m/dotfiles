@@ -3,12 +3,12 @@ local VAULT_FOLDER = OBSIDIAN_HOME .. "003_vault/"
 local INBOX_FOLDER = OBSIDIAN_HOME .. "000_inbox/"
 local JOURNAL_FOLDER = OBSIDIAN_HOME .. "001_journal/"
 
-function open_inbox()
-    vim.cmd("NvimTreeOpen " .. INBOX_FOLDER)
-end
 
-function vault_folder() vim.cmd("NvimTreeOpen " .. VAULT_FOLDER) end
-function journal_folder() vim.cmd("NvimTreeOpen " .. JOURNAL_FOLDER) end
+function open_inbox() vim.cmd("NvimTreeOpenAt " .. INBOX_FOLDER) end
+-- TODO: remove al of this that's not opening obsidian_home
+-- function open_inbox() vim.cmd("NvimTreeOpenAt " .. INBOX_FOLDER) end
+function vault_folder() vim.cmd("NvimTreeOpenAt " .. VAULT_FOLDER) end
+function journal_folder() vim.cmd("NvimTreeOpenAt " .. JOURNAL_FOLDER) end
 function daily_note() vim.cmd("edit " .. JOURNAL_FOLDER .. os.date("%Y-%m-%d") .. '.md') end
 function next_daily_note() vim.cmd("edit " .. JOURNAL_FOLDER .. os.date("%Y-%m-%d", (os.time() + 86400)) .. '.md') end
 function previous_daily_note() vim.cmd("edit " .. JOURNAL_FOLDER .. os.date("%Y-%m-%d", (os.time() - 86400)) .. '.md') end
@@ -38,13 +38,8 @@ function list_files_in_directory(directory)
   return files
 end
 
-function new_note(params)
-  local args = params.args
-  if #args == 0 then
+function new_note()
     vim.cmd("edit " .. INBOX_FOLDER .. os.date("%Y-%m-%dT%H:%M:%S%z") .. '.md')
-  else
-    vim.cmd("edit " .. INBOX_FOLDER .. args .. '.md')
-  end
 end
 
 function deque_inbox()
@@ -55,7 +50,6 @@ function deque_inbox()
         print("Your inbox is empty")
     end
 end
-
 
 -- calendar stuff
 function calendar_function(day,month,year,week,dir)
@@ -74,8 +68,12 @@ vim.cmd([[
   endfunction
 ]])
 
-function OpenDates()
-    -- Get visual selection boundaries
+function OpenDates(opts)
+    local current_date = os.date("*t")
+    local month = current_date.month
+    if opts.args ~= "" then
+        month = opts.args
+    end
     local start_line = vim.fn.line("'<")
     local end_line = vim.fn.line("'>")
     local start_col = vim.fn.col("'<")
@@ -105,12 +103,12 @@ function OpenDates()
         if item:match("%S") then
             local number = tonumber(item)
             local padded = string.format("%02d", number)
-            local current_date = os.date("*t")
-            local filepath = string.format("%d-%02d-%s.md", 
+            local filepath = string.format("%d-%02d-%s.md",
                 current_date.year,
-                current_date.month,
+                month,
                 padded)
             vim.cmd("vsplit " .. JOURNAL_FOLDER .. filepath)
         end
     end
 end
+

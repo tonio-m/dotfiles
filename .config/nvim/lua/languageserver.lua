@@ -2,27 +2,12 @@ local cmp = require('cmp')
 local lspconfig = require('lspconfig')
 local cmp_nvim_lsp = require('cmp_nvim_lsp')
 
-local minuet = require('minuet')
-
-minuet.setup {
-    enabled = true,
-    add_single_line_entry = false,
-    n_completions = 1,
-    provider = 'claude',
-    provider_options = {
-        model = 'claude-3-5-haiku-20241022',
-        stream = true,
-    },
-    throttle = 1000,
-}
-
 cmp.setup({
     view = { entries = 'wildmenu' },
     experimental = {
         ghost_text = true,
     },
     mapping = cmp.mapping.preset.insert({
-      ["<C-x>"] = minuet.make_cmp_map(),
       ['<CR>'] = cmp.mapping.confirm({ select = true }),
       ['<Tab>'] = cmp.mapping.confirm({ select = true }),
     }),
