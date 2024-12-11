@@ -49,7 +49,7 @@ gh_switch() {
 
 # c() {
 #   local content="$*"
-#   curl https://api.openai.com/v1/chat/completions \
+#   curl -s https://api.openai.com/v1/chat/completions \
 #     -H "Content-Type: application/json" \
 #     -H "Authorization: Bearer $OPENAI_API_KEY" \
 #     -d '{
@@ -59,9 +59,29 @@ gh_switch() {
 #     }' | jq -r '.choices[0].message.content'
 # }
 
+c() {
+  local content="$*"
+  curl -s https://api.anthropic.com/v1/complete \
+    -H "Content-Type: application/json" \
+    -H "anthropic-version: 2023-06-01" \
+    -H "x-api-key: $ANTHROPIC_API_KEY" \
+    -d '{
+      "model": "claude-2",
+      "prompt": "\n\nHuman: '"${content}"'\n\nAssistant:",
+      "max_tokens_to_sample": 1024,
+      "temperature": 0.7
+    }' | jq -r '.completion'
+}
+
+
 alias apa="export AWS_PROFILE=amherst"
 # alias s3r="aws s3 ls --recursive --human-readable"
 alias s3="aws s3 ls --human-readable"
 alias git_undo="git reset --soft HEAD~1"
 alias cdv="cd ~/.config/nvim"
-alias c="llm chat"
+alias cdy="cd ~/.local/share/yadm/repo.git"
+alias cdj="cd ~/Obsidian/marco_vault"
+# alias c="llm chat"
+alias vps="ssh -i ~/.ssh/tonio-m root@$VPS_IP"
+alias dbx="python ~/.config/scripts/databricks_repl.py"
+alias vj="vim ~/Obsidian/marco_vault"
