@@ -14,8 +14,14 @@ require('nvim-tree').setup({
     },
 })
 
+require('avante').setup ({
+    claude = {
+        model = "claude-3-5-haiku-latest"
+    },
+})
+
 local gobllm = require('gobllm')
-gobllm.setup({})
+gobllm.setup({ })
 
 -- settings
 vim.o.tabstop = 4
@@ -50,6 +56,14 @@ vim.api.nvim_create_autocmd('TermOpen', {
     end,
 })
 
+-- disable ESC in avante buffer
+vim.api.nvim_create_autocmd('FileType', {
+    pattern = 'Avante',
+    callback = function()
+        vim.keymap.set({'n', 'o'}, '<ESC>', '<Nop>', { buffer = true })
+    end
+})
+
 -- lsp stuff 
 vim.keymap.set('n', 'gr', vim.lsp.buf.references, {})
 vim.keymap.set('n' , 'gd', vim.lsp.buf.definition, {})
@@ -57,6 +71,12 @@ vim.keymap.set('n' , 'gd', vim.lsp.buf.definition, {})
 -- journal actions 
 vim.api.nvim_create_user_command('Cd', "cd %:h<CR>", {})
 vim.api.nvim_create_user_command('Vf', vault_file, {})
+vim.api.nvim_create_user_command('NvimTreeOpenAt', function(opts)
+    require('nvim-tree.api').tree.open({
+        path = opts.args,
+        update_root = false
+    })
+end, { nargs = 1, complete = 'dir' })
 vim.keymap.set('n', '<leader>nn', new_note, { noremap = true, silent = false })
 vim.keymap.set('n', '<leader>dd', daily_note, { noremap = true, silent = false })
 vim.keymap.set('n', '<leader>id', deque_inbox, { noremap = true, silent = false})
@@ -99,5 +119,106 @@ vim.keymap.set("n", "<leader>gc", gobllm.chat_coding_assistant, {noremap = true,
 
 -- calendar stuff
 vim.g.calendar_action = 'CalendarFunction'
-vim.api.nvim_create_user_command('OpenDates', OpenDates, { range = true })
+vim.api.nvim_create_user_command('OpenDates', OpenDates, { range = true, nargs = '?' })
 vim.keymap.set('n', '<leader>cal', ':CalendarVR<CR>:vertical resize 30<CR>', { noremap = true, silent = false })
+
+-- macros
+vim.fn.setreg('h', [[A
+- 9 -
+- 10 -
+- 11 -
+- 12 -
+- 13 -
+- 14 -
+- 15 -
+- 16 -
+- 17 -
+- 18 -
+]])
+
+
+
+--- TODO: this below is experimental, untested
+local db = require('dashboard')
+
+-- Custom banner with ASCII art
+local banner = {
+[[]],
+[[]],
+[[]],
+[[]],
+[[]],
+[[]],
+[[]],
+[[]],
+[[]],
+[[]],
+[[]],
+[[]],
+[[]],
+[[]],
+[[ ↓↡↓Ὺɭ↓ɿ　↶　↓↓ 🌾 ↡ ↓↶↓↡ 　 ↶↓↡↡↓↓↓↓↡ⶫ↓ ↓ 　↓↡↓⇟  ↡↓↓↓ 🌷 ↓⇟↓🌿↡Ὺɭ↓ ]],
+[[ ɭ   ________  ________  ________  ________   ________  ________     ]],
+[[↡   /    /   \/        \/        \/    /   \ /        \/        \↓🌿↡]],
+[[ Ὺ /         /   --    /    /    /         /_/       //         /↓↓↓ ]],
+[[↓↓/         /      ___/    /    /\        //         /         / ↓↓↓ ]],
+[[ ↓\__/_____/\________/\________/  \______/ \________/\__/__/__/  🌿↡ ]],
+[[ ⚲↓ 丿↓↓⇟↓　 ↡↓Ր ↓ ↡↓↷↓Ὺ↓🌱↓ ↓　↓↶🌾↓↶↡↡丿 ↓Ὺ ɿ⇂↓ↆ↓↓ↆ　↡↓↓↓  ⇟↓↓ ↡↡  ]],
+[[]],
+[[]],
+[[]],
+[[]],
+[[]],
+[[]],
+}
+
+
+db.setup({
+    theme = 'doom',
+    config = {
+        header = banner,
+        center = {
+            {
+                icon = '  ',
+                desc = 'Find File                 ',
+                action = 'Telescope find_files'
+            },
+            {
+                icon = '  ',
+                desc = 'Open Inbox Folder             ',
+                action = 'tabnew | lua open_inbox()'
+            },
+            {
+                icon = '  ',
+                desc = 'Find Word                 ',
+                action = 'Telescope live_grep'
+            },
+            {
+                icon = '  ',
+                desc = 'New File                  ',
+                action = 'enew'
+            },
+            {
+                icon = '  ',
+                desc = 'Config                    ',
+                action = 'e ~/.config/nvim/init.lua'
+            },
+            {
+                icon = '  ',
+                desc = 'Quit Neovim              ',
+                action = 'qa'
+            },
+        },
+        footer = {
+            "tonio-m"
+        }  -- Footer can be left empty
+    }
+})
+
+-- Custom highlights
+vim.cmd([[
+    highlight DashboardHeader guifg=#6272A4
+    highlight DashboardCenter guifg=#F8F8F2
+    highlight DashboardShortcut guifg=#BD93F9
+    highlight DashboardFooter guifg=#6272A4
+]])
