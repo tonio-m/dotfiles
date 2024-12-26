@@ -16,7 +16,7 @@ require('nvim-tree').setup({
 
 require('avante').setup ({
     claude = {
-        model = "claude-3-5-haiku-latest"
+        model = "claude-3-5-sonnet-latest"
     },
 })
 
@@ -98,7 +98,6 @@ vim.keymap.set('n', '<leader>bp', ':b#<CR>', { noremap = true, silent = false })
 vim.keymap.set('n', '<leader>ne', ':new<CR>', { noremap = true, silent = false })
 vim.keymap.set('n', '<leader>ve', ':vnew<CR>', { noremap = true, silent = false })
 vim.keymap.set('n', '<leader>ta', ':tabnew<CR>', { noremap = true, silent = false })
-vim.keymap.set('n', '<leader>q', ':execute "silent! bwipeout!"<CR>', { noremap = true, silent = false })
 
 -- editor stuff
 vim.keymap.set('n', 'Y', 'y$', { noremap = true, silent = false }) -- line-wise yank
@@ -109,6 +108,7 @@ vim.keymap.set('v', '*', 'y/\\V<C-R>=escape(@",\'/\\\')<CR><CR>', { noremap = tr
 -- plugins
 vim.keymap.set('n', '<leader>e', ':NvimTreeToggle<CR>', { noremap = true, silent = false })
 vim.keymap.set('n', '<leader>fg', ':Telescope live_grep<CR>', { noremap = true, silent = false })
+vim.keymap.set('n', '<leader>ff', ':Telescope find_files<CR>', { noremap = true, silent = false })
 
 -- gobllm.nvim stuff
 vim.keymap.set("n", "<leader>gg", gobllm.fill , {noremap = true, silent=false})
@@ -137,8 +137,6 @@ vim.fn.setreg('h', [[A
 ]])
 
 
-
---- TODO: this below is experimental, untested
 local db = require('dashboard')
 
 -- Custom banner with ASCII art
@@ -180,23 +178,13 @@ db.setup({
         center = {
             {
                 icon = '  ',
-                desc = 'Find File                 ',
-                action = 'Telescope find_files'
+                desc = 'Open Inbox Folder (' .. tostring(count_inbox_files()) .. ' files)',
+                action = 'lua edit_inbox()'
             },
             {
                 icon = '  ',
-                desc = 'Open Inbox Folder             ',
-                action = 'tabnew | lua open_inbox()'
-            },
-            {
-                icon = '  ',
-                desc = 'Find Word                 ',
-                action = 'Telescope live_grep'
-            },
-            {
-                icon = '  ',
-                desc = 'New File                  ',
-                action = 'enew'
+                desc = 'Open Bookmarks Folder',
+                action = 'lua edit_bookmarks()'
             },
             {
                 icon = '  ',

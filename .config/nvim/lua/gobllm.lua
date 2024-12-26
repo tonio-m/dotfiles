@@ -255,6 +255,8 @@ function chat_factory(system_prompt)
         local line_count = vim.api.nvim_buf_line_count(current_buffer)
         vim.api.nvim_buf_set_lines(current_buffer, line_count, line_count, false, split_into_lines("### A:\n" .. answer .. "\n### Q:"))
         log_message("Chat Completion successful.")
+        -- go to last line of the buffer
+        vim.api.nvim_win_set_cursor(0, {vim.api.nvim_buf_line_count(0), 0})
     end
 end
 
@@ -262,9 +264,18 @@ M.chat_coding_assistant = chat_factory(CHAT_CODING_ASSISTANT_SYSTEM_PROMPT)
 M.chat_general_helper = chat_factory(CHAT_GENERAL_HELPER_SYSTEM_PROMPT)
 
 function M.open_chat()
+  vim.api.nvim_create_autocmd("FileType", {
+    pattern = "gobllm",
+    callback = function()
+        vim.api.nvim_buf_set_keymap(0, 'n', '<CR>', ":lua require('gobllm').chat_general_helper()<CR>", { noremap = true, silent = true })
+        vim.api.nvim_buf_set_keymap(0, 'n', '<C-s>', ":lua require('gobllm').chat_general_helper()<CR>", { noremap = true, silent = true })
+    end
+  })
   vim.cmd("enew")
-  vim.cmd("set filetype=markdown")
+  vim.cmd("set filetype=gobllm")
+  vim.cmd("set syntax=markdown")
   vim.api.nvim_buf_set_lines(0, 0, 0, false, { "### Q:" })
+  vim.api.nvim_buf_set_option(0, "buftype", "nofile")
 end
 
 function M.setup(opts)
