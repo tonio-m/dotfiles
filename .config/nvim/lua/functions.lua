@@ -2,20 +2,13 @@ local OBSIDIAN_HOME = os.getenv("OBSIDIAN_HOME")
 local VAULT_FOLDER = OBSIDIAN_HOME .. "003_vault/"
 local INBOX_FOLDER = OBSIDIAN_HOME .. "000_inbox/"
 local JOURNAL_FOLDER = OBSIDIAN_HOME .. "001_journal/"
-local BOOKMARKS_FOLDER = OBSIDIAN_HOME .. "002_bookmarks/"
-
 
 function count_inbox_files()
     local files = list_files_in_directory(INBOX_FOLDER)
     return #files
 end
-
 function open_inbox() vim.cmd("NvimTreeOpenAt " .. INBOX_FOLDER) end
-function edit_inbox() vim.cmd("e " .. INBOX_FOLDER) end
-function edit_bookmarks() vim.cmd("e " .. BOOKMARKS_FOLDER) end
--- TODO: vault folder and journal folder is not really being used 
-function vault_folder() vim.cmd("NvimTreeOpenAt " .. VAULT_FOLDER) end
-function journal_folder() vim.cmd("NvimTreeOpenAt " .. JOURNAL_FOLDER) end
+
 function daily_note() vim.cmd("edit " .. JOURNAL_FOLDER .. os.date("%Y-%m-%d") .. '.md') end
 function next_daily_note() vim.cmd("edit " .. JOURNAL_FOLDER .. os.date("%Y-%m-%d", (os.time() + 86400)) .. '.md') end
 function previous_daily_note() vim.cmd("edit " .. JOURNAL_FOLDER .. os.date("%Y-%m-%d", (os.time() - 86400)) .. '.md') end
