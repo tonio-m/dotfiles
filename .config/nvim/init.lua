@@ -3,6 +3,7 @@ require("functions")
 require("markdown_links")
 require("languageserver")
 require("init_dashboard")
+require("calendar")
 require("onedark").setup()
 require('nvim-tree').setup({
     hijack_netrw = true,
@@ -13,11 +14,7 @@ require('nvim-tree').setup({
       },
     },
 })
-require('avante').setup ({
-    claude = {
-        model = "claude-3-5-sonnet-latest",
-    },
-})
+
 local gobllm = require('gobllm')
 gobllm.setup({ })
 
@@ -42,7 +39,6 @@ vim.g.netrw_maxfilenamelen = 66
 vim.o.backspace = 'indent,eol,start'
 vim.cmd('syntax sync minlines=10000')
 vim.opt.clipboard:append('unnamedplus')
-vim.g.calendar_action = 'CalendarFunction'
 vim.g.markdown_fenced_languages = {'json', 'python', 'html', 'javascript', 'bash', 'sql', 'cpp', 'lua'}
 -- terminal settings
 vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { noremap = true, silent = false })
@@ -51,19 +47,10 @@ vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { noremap = true, silent = fals
 vim.keymap.set('n', 'gr', vim.lsp.buf.references, {})
 vim.keymap.set('n' , 'gd', vim.lsp.buf.definition, {})
 
--- nvim-tree 
--- vim.api.nvim_create_user_command('NvimTreeOpenAt', function(opts) -- don't change root when opening nvim-tree
---     require('nvim-tree.api').tree.open({
---         path = opts.args,
---         update_root = false
---     })
--- end, { nargs = 1, complete = 'dir' })
-
 -- journal config
 vim.keymap.set('n', '<leader>nn', new_note, { noremap = true, silent = false })
 vim.keymap.set('n', '<leader>dd', daily_note, { noremap = true, silent = false })
-vim.keymap.set('n', '<leader>id', deque_inbox, { noremap = true, silent = false})
-vim.keymap.set('n', '<leader>in', open_inbox, { noremap = true, silent = false })
+-- vim.keymap.set('n', '<leader>id', deque_inbox, { noremap = true, silent = false})
 vim.keymap.set('n', '<leader>dn', next_daily_note, { noremap = true, silent = false })
 vim.keymap.set('n', '<leader>dp', previous_daily_note, { noremap = true, silent = false })
 
@@ -93,14 +80,6 @@ vim.keymap.set('n', '<leader>E', ':NvimTreeFindFile<CR>', { noremap = true, sile
 vim.keymap.set('n', '<leader>fg', ':Telescope live_grep<CR>', { noremap = true, silent = false })
 vim.keymap.set('n', '<leader>ff', ':Telescope find_files<CR>', { noremap = true, silent = false })
 vim.keymap.set('n', '<leader>fb', ':Telescope buffers<CR>')
-
--- gobllm.nvim stuff
-vim.keymap.set("n", "<leader>go", gobllm.open_chat, {noremap = true, silent=false})
-vim.keymap.set("v", "<leader>gr", gobllm.replace, {noremap = true, silent=false})
-
--- calendar stuff
-vim.api.nvim_create_user_command('OpenDates', OpenDates, { range = true, nargs = '?' }) -- open dates in calendar
-vim.keymap.set('n', '<leader>cal', ':CalendarVR<CR>:vertical resize 30<CR>', { noremap = true, silent = false }) -- open calendar
 
 -- autocommands:
 vim.api.nvim_create_autocmd('TermOpen', {
