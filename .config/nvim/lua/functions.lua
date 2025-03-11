@@ -25,6 +25,7 @@ local JOURNAL_FOLDER = OBSIDIAN_HOME .. "001_journal/"
 -- end
 
 function daily_note() vim.cmd("edit " .. JOURNAL_FOLDER .. os.date("%Y-%m-%d") .. '.md') end
+function new_note() vim.cmd("edit " .. INBOX_FOLDER .. os.date("%Y-%m-%d") .. '.md') end
 function next_daily_note() vim.cmd("edit " .. JOURNAL_FOLDER .. os.date("%Y-%m-%d", (os.time() + 86400)) .. '.md') end
 function previous_daily_note() vim.cmd("edit " .. JOURNAL_FOLDER .. os.date("%Y-%m-%d", (os.time() - 86400)) .. '.md') end
 
@@ -32,9 +33,3 @@ function sort_by_width(opts)
   local command = string.format(':%d,%d! awk \'{ print length(), $0 | "sort -n | cut -d\\\\  -f2-" }\'', opts.line1, opts.line2)
   vim.cmd(command)
 end
-
-function new_note()
-    -- vim.cmd("edit " .. INBOX_FOLDER .. os.date("%Y-%m-%dT%H:%M:%S%z") .. '.md')
-    vim.cmd("edit " .. INBOX_FOLDER .. " | normal a")
-end
-

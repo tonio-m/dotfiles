@@ -31,5 +31,17 @@ require("lazy").setup({
   -- colorscheme that will be used when installing plugins.
   install = { colorscheme = { "habamax" } },
   -- automatically check for plugin updates
-  checker = { enabled = true, notify = true, frequency = 86400, } -- check for updates once a day
+  checker = { enabled = true, notify = true, frequency = 86400, }, -- check for updates once a day
+})
+
+vim.api.nvim_create_autocmd("User", {
+    pattern = "LazyCheck",
+    -- pattern = "LazyVimStarted",
+    desc = "Update lazy.nvim plugins",
+    callback = function(event)
+      local start_time = os.clock()
+      require('lazy').sync({ wait = false, show = false })
+      local end_time = os.clock()
+      print("Lazy plugins synced in " .. (end_time - start_time) * 1000 .. "ms")
+    end,
 })

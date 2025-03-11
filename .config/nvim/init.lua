@@ -16,7 +16,9 @@ require('nvim-tree').setup({
 })
 
 local gobllm = require('gobllm')
-gobllm.setup({ })
+gobllm.setup({
+    model = "claude-3-7-sonnet-latest",
+})
 
 -- settings
 vim.o.tabstop = 4
@@ -55,18 +57,20 @@ vim.keymap.set('n', '<leader>dn', next_daily_note, { noremap = true, silent = fa
 vim.keymap.set('n', '<leader>dp', previous_daily_note, { noremap = true, silent = false })
 
 -- buffer/tab manipulation
+vim.keymap.set('n', 'ZD', ':!rm %<CR>:q!<CR>', { silent = true })
 vim.keymap.set('n', '<C-h>', '<C-w>h', { noremap = true, silent = false })
 vim.keymap.set('n', '<C-j>', '<C-w>j', { noremap = true, silent = false })
 vim.keymap.set('n', '<C-k>', '<C-w>k', { noremap = true, silent = false })
 vim.keymap.set('n', '<C-l>', '<C-w>l', { noremap = true, silent = false })
-vim.keymap.set('n', '<leader>w', ':w<CR>', { noremap = true, silent = false })
+vim.keymap.set('n', '<C-s>', ':w<CR>', { noremap = true, silent = false })
 vim.keymap.set('n', '<leader>bb', ':b#<CR>', { noremap = true, silent = false })
 vim.keymap.set('n', '<leader>bn', ':bn<CR>', { noremap = true, silent = false })
-vim.keymap.set('n', '<leader>bp', ':b#<CR>', { noremap = true, silent = false })
+vim.keymap.set('n', '<leader>bp', ':bp<CR>', { noremap = true, silent = false })
 vim.keymap.set('n', '<leader>ne', ':new<CR>', { noremap = true, silent = false })
 vim.keymap.set('n', '<leader>ve', ':vnew<CR>', { noremap = true, silent = false })
-vim.keymap.set('n', '<leader>ta', ':tabnew<CR>', { noremap = true, silent = false })
-vim.keymap.set('n', '<leader>rm', ':!rm "%"<CR>')
+vim.keymap.set('n', '<leader>w', ':set wrap!<CR>', { noremap = true, silent = false })
+
+-- vim.keymap.set('n', '<leader>rm', ':!rm "%"<CR>')
 
 -- editor stuff
 vim.keymap.set('n', 'Y', 'y$', { noremap = true, silent = false }) -- line-wise yank
@@ -112,3 +116,5 @@ vim.fn.setreg('h', [[A
 - 17 
 - 18 
 ]])
+
+
