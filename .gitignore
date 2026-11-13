@@ -1,0 +1,19 @@
+# Allowlist: ~/.claude is mostly credentials, transcripts and caches. Only what's listed below
+# is versioned; add a line here to version something new.
+/*
+
+!/.gitignore
+!/README.md
+!/CLAUDE.md
+!/workflows/
+!/scheduled-tasks/
+
+!/skills/
+/skills/*
+!/skills/bro/
+!/skills/dispatch/
+!/skills/kickoff/
+!/skills/ship/
+!/skills/thermo-nuclear-code-quality-review/
+!/skills/unslop/
+!/skills/xv-anna-try-it/
