@@ -19,6 +19,6 @@ From the session's brief, take the **ticket** path, the **feature branch**, the 
    Done when `git log -1 <feature branch>` is this commit.
 6. **Sync the main checkout's env files.** For each env file in the workflow doc, compare its keys with its example file on the feature branch. Add derived keys as the doc says; list the others for the user to fill in. Done when every key in every example file is present or listed.
 
-7. **Tell the parent session.** Send it a message with `SendMessage` (`to`: its session id): the ticket that shipped, the commit, and that the feature branch was fast-forwarded to it. Ask it to run `/dispatch`'s **After each ship** step now and start the next safe batch. Without a parent session in the brief, skip this and tell the user to run `/dispatch` in the parent session.
+7. **Tell the parent session.** Send it a message with `SendMessage` (`to`: its session id): the ticket that shipped, the commit, and that the feature branch was fast-forwarded to it. Ask it to run `/dispatch`'s **After each ship** step now. The app won't let it start sessions from your message, only from the user's own words, so it puts the next tickets up as cards. Without a parent session in the brief, skip this and tell the user to run `/dispatch` in the parent session.
 
-Report in two lines: the commit and the feature branch it's on now, then any env keys left for the user. Nothing is pushed.
+Report in three lines: the commit and the feature branch it's on now, any env keys left for the user, and that the next tickets wait as cards in the parent session (one click each, or all at once with `/dispatch` there). Nothing is pushed.

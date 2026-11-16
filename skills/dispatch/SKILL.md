@@ -24,9 +24,9 @@ Run in the parent session, on the feature branch, after `/kickoff`. Read the rep
 
 ## After each ship
 
-From then on, the user doesn't need to ask: each time a ticket session's note says it committed and fast-forwarded the feature branch, check the ticket is done on the feature branch, then recompute the frontier and start the next safe batch right away. Tell the user in one line what landed and what started. When the frontier is empty and nothing is running, say every ticket is done and stop.
+From then on, the user doesn't need to ask: each time a ticket session's note says it committed and fast-forwarded the feature branch, check the ticket is done on the feature branch, then recompute the frontier and put up the next safe batch. Tell the user in one line what landed and what's waiting. When the frontier is empty and nothing is running, say every ticket is done and stop.
 
-If the app refuses a start (it allows them only shortly after the user's own turn), propose each ticket as a session card instead, with the same brief, and say so.
+The app starts a session only in a turn that began with the user's own message. A ship note is another session's message, so in that turn propose each ticket in the batch as a card instead (`initiation: "own_initiative"`, same title and brief), and say the cards are waiting for a click. A card drops `source_branch`, so its worktree is cut from the repo's default branch. The brief's **Base** line moves it onto the feature branch first. When the turn began with the user's own message (they ran `/dispatch`, said "go", or ran `/ship` here), start the sessions directly.
 
 ## Starting a ticket
 
@@ -34,6 +34,8 @@ Start a session with `use_worktree: true`, `source_branch` set to the feature br
 
 ```
 /mattpocock-skills:implement <ticket path>
+
+Base: before anything else, if `git rev-parse HEAD` isn't <sha>, run `git checkout -B <this worktree's branch> <sha>` in this fresh worktree and confirm `git log -1` is <sha>. If that fails, stop and message the parent session.
 
 Feature branch: <feature branch> at <sha>. Main checkout: <path>. Parent session: <this session's id>.
 Spec: .scratch/<feature>/spec.md. Repo workflow: ~/.claude/workflows/<repo>.md.
