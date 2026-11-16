@@ -17,4 +17,4 @@ Versioned at tonio-m/dotfiles, branch `claude`, public. Whenever a task changes 
 
 # Sizing after a grilling
 
-When a grilling ends, give a sizing verdict: the files the change should touch, the ticket count, and any glossary or env changes. Tiny (one or two files, no new glossary terms, no env changes): implement in place, staged, with no spec. Anything else: `/to-spec`, `/to-tickets` when it's more than one ticket, then `/kickoff`. I can overrule it.
+`/shape` holds the sizing rule. When a grilling runs outside it, end with the same sizing verdict and offer to carry on as `/shape` would.
