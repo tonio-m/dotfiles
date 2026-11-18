@@ -29,10 +29,14 @@ Gitignored, so a worktree doesn't get them and they don't update when a ticket a
 |---|---|
 | `.env` | `.env.example` |
 | `.env.runner` | `.env.runner.example` |
+| `.env.gateway` | `.env.gateway.example` |
+
+Any `.env*.example` added later names one more: read the examples, not this table, when copying.
 
 - A ticket that adds a variable also adds it, with a comment, to the example file.
 - `ANNA_KB_DIR` in `.env.runner` is the absolute path of *this* clone's `packages/spec_bot/knowledge_base` (`packages/spec_bot/neo/knowledge_base` on branches from before agent-lineup 03), with forward slashes. It differs per checkout and worktree, so it's always derived, never copied.
-- Any other missing key is a secret or a choice: ask the user for it.
+- `ANNA_GATEWAY_KEY` in `.env` is a key of the gateway the stack runs: each worktree stack's gateway has its own database, so `/xv-anna-try-it` makes one there. Never copied.
+- Any other missing or blank key is a secret or a choice: ask the user for it.
 
 ## Local app
 
