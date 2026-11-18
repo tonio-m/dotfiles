@@ -35,7 +35,7 @@ Any `.env*.example` added later names one more: read the examples, not this tabl
 
 - A ticket that adds a variable also adds it, with a comment, to the example file.
 - `ANNA_KB_DIR` in `.env.runner` is the absolute path of *this* clone's `packages/spec_bot/knowledge_base` (`packages/spec_bot/neo/knowledge_base` on branches from before agent-lineup 03), with forward slashes. It differs per checkout and worktree, so it's always derived, never copied.
-- `ANNA_GATEWAY_KEY` in `.env` is a key of the gateway the stack runs: each worktree stack's gateway has its own database, so `/xv-anna-try-it` makes one there. Never copied.
+- `ANNA_GATEWAY_KEY` in `.env` is, for now, the same value as `LITELLM_MASTER_KEY` in `.env.gateway` (each stack runs its own gateway), so copying both files is enough.
 - Any other missing or blank key is a secret or a choice: ask the user for it.
 
 ## Local app
