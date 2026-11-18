@@ -28,6 +28,10 @@ From then on, the user doesn't need to ask: each time a ticket session's note sa
 
 The app starts a session only in a turn that began with the user's own message. A ship note is another session's message, so in that turn propose each ticket in the batch as a card instead (`initiation: "own_initiative"`, same title and brief), and say the cards are waiting for a click. A card drops `source_branch`, so its worktree is cut from the repo's default branch. The brief's **Base** line moves it onto the feature branch first. When the turn began with the user's own message (they ran `/dispatch`, said "go", or ran `/ship` here), start the sessions directly.
 
+## Other work while dispatching
+
+Side work the user asks for in this session (not a ticket) also lands on the feature branch, unless the user names another branch. Start it like a ticket: `source_branch` set to the feature branch, and a brief with the same **Base**, **Feature branch** (with its sha), **Main checkout**, **Parent session** and **Owned by sibling sessions** lines, so `/ship` lands it there. Never cut it from the base branch, and never name the base branch as where it lands.
+
 ## Starting a ticket
 
 Start a session with `use_worktree: true`, `source_branch` set to the feature branch, `context: "fresh"`, title `Implement <NN>: <ticket title>`, and this brief, filled in:
