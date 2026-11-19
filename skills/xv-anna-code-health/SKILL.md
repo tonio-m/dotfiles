@@ -7,7 +7,7 @@ description: Weekly code-health sweep of the whole xv-anna repo, written to a da
 
 Run at the root of the xv-anna checkout. A read-only sweep. The only file you write is the report. Code stays untouched, nothing is staged or committed, and credential findings are reported as they are, with no rotation advice.
 
-Scope: tracked source under `packages/`, `test/`, `scripts/`, `docker/`, `compose/`. Leave out `.scratch/` and `packages/spec_bot/neo/knowledge_base/`.
+Scope: tracked source under `packages/`, `test/`, `scripts/`, `docker/`, `compose/`. Leave out `.scratch/` and `packages/spec_bot/knowledge_base/` (step 5 reads `.scratch/*/issues/` only to predict upcoming work).
 
 ## Steps
 
@@ -19,18 +19,24 @@ Scope: tracked source under `packages/`, `test/`, `scripts/`, `docker/`, `compos
 
 4. **Docstrings drifting from the code.** For the longest docstrings and every docstring that states specifics (status codes, limits, timeouts, file names, behaviours), check each claim against the code. Also grep for names of things that no longer exist. Done when each such claim is marked as holding or as drifted.
 
-5. **Review of what changed.** Review only source files changed since the previous report's commit: `git diff --name-only <commit>..HEAD` over the scope. With no previous report, or on the first Friday of the month, review the whole scope instead. No changed files means no review this week: carry the previous report's open findings over as **still open** after checking that each one's code is unchanged.
+5. **Work that can't run in parallel.** Features are split into tickets that run side by side only when they change different files, so a file that many pieces of work must touch holds everything up. Find those files two ways:
+   - **Past clashes.** `git log --since=<previous report's date, or 30 days> --name-only --format='%s'` over the scope. For each file, count the commits and the distinct features that touched it (a feature is a ticket commit's `.scratch/<feature>/` folder, or the branch name in a merge's subject). Flag files touched by 3+ features.
+   - **Coming clashes.** Read every ticket in `.scratch/*/issues/` whose `Status:` is `ready-for-agent` or `ready-for-human`, and list the files it names or clearly implies. Flag any file that tickets from 2+ features will change, or two tickets of one feature that aren't chained by `Blocked by`.
 
-   Dispatch one subagent with `model: "sonnet"` for the changed files, or one per area on a full sweep (`packages/spec_bot` top-level modules; `packages/spec_bot/neo` + `vac` + `tooling.py` + `agents.py` + `models.py`; `packages/sandbox_runner` with its Dockerfiles, compose and egress config). Each reviewer reads `~/.claude/skills/thermo-nuclear-code-quality-review/SKILL.md` and applies it as its review standard: to `git diff <commit>..HEAD` on a weekly run, to the area's files as they stand on a full sweep. Add `docs/adr/*.md` and `GLOSSARY.md` as the repo's own boundaries. Brief: report only URGENT and worth-fixing findings, each with file:line, what's wrong and the concrete restructuring that fixes it; under 300 words. Read the code yourself for every URGENT finding and drop or downgrade any that doesn't hold.
+   For each flagged file, say why the work meets there and give one verdict: **split** (it mixes jobs; name the job to move out, matching step 2 when the file is there too), **registration point** (each feature adds one line, such as an import or a list entry; the clash is a trivial rebase, leave it), or **shared by nature** (a prompt, README or glossary that every feature writes to; suggest a way to separate the work, such as a skill folder per instruction or doc edits left for `/ship`). Done when every flagged file has a verdict.
+
+6. **Review of what changed.** Review only source files changed since the previous report's commit: `git diff --name-only <commit>..HEAD` over the scope. With no previous report, or on the first Friday of the month, review the whole scope instead. No changed files means no review this week: carry the previous report's open findings over as **still open** after checking that each one's code is unchanged.
+
+   Dispatch one subagent with `model: "sonnet"` for the changed files, or one per area on a full sweep (`packages/spec_bot` top-level modules; `packages/spec_bot/agents/` + `tools/` + `tooling.py` + `registry.py` + `models.py`; `packages/sandbox_runner` with its Dockerfiles, compose and egress config). Each reviewer reads `~/.claude/skills/thermo-nuclear-code-quality-review/SKILL.md` and applies it as its review standard: to `git diff <commit>..HEAD` on a weekly run, to the area's files as they stand on a full sweep. Add `docs/adr/*.md` and `GLOSSARY.md` as the repo's own boundaries. Brief: report only URGENT and worth-fixing findings, each with file:line, what's wrong and the concrete restructuring that fixes it; under 300 words. Read the code yourself for every URGENT finding and drop or downgrade any that doesn't hold.
 
 ## Report
 
 Write `.scratch/code-health/<YYYY-MM-DD>.md`:
 
-- Top line: `Commit: <git rev-parse HEAD>`, and whether step 5 reviewed the changes or the whole scope.
+- Top line: `Commit: <git rev-parse HEAD>`, and whether step 6 reviewed the changes or the whole scope.
 - **Urgent** first. Each one: a bold title, then two short lines (the problem, then the fix) with its file:line and its new / still-open mark.
 - Then **Worth fixing**, one line each.
-- Then the step 2–4 results: a table of jobs per flagged file, the bloat hits, and the drifted claims.
+- Then the step 2–5 results: a table of jobs per flagged file, the bloat hits, the drifted claims, and a **Parallel work** table (file, features touching it past and coming, verdict). A **split** verdict on a file that blocks a ticket ready now also goes under **Urgent**.
 - Close with **Gone since last report**.
 
 Once written, rewrite the report's prose with the `anthropic-skills:bro` skill (plain, short, no jargon), then the `anthropic-skills:unslop` skill, and save the result over it. Keep file:line references, counts and code names exactly as they are.
