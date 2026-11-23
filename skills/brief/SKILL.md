@@ -1,5 +1,5 @@
 ---
-name: chat
+name: brief
 description: Answer like a conversation, not an essay. Use when the user asks for shorter, conversational answers.
 ---
 
