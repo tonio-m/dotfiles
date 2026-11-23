@@ -11,6 +11,7 @@
 !/skills/
 /skills/*
 !/skills/bro/
+!/skills/chat/
 !/skills/dispatch/
 !/skills/kickoff/
 !/skills/ship/
