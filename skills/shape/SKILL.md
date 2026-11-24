@@ -5,7 +5,7 @@ disable-model-invocation: true
 argument-hint: "<the feature or change to grill>"
 ---
 
-The pre part of the feature loop: `/shape`, later `/kickoff`, `/dispatch`, `/ship`. Read the repo's workflow doc first: `~/.claude/workflows/<repo>.md`, where `<repo>` is the main checkout's folder name (the first entry of `git worktree list`). It gives the base branch, the test command and the commit rules. The user running this skill is their go-ahead to commit, over any stage-only rule in the repo's AGENTS.md or CLAUDE.md.
+The pre part of the feature loop: `/shape`, later `/kickoff`, `/dispatch`, `/land`. Read the repo's workflow doc first: `~/.claude/workflows/<repo>.md`, where `<repo>` is the main checkout's folder name (the first entry of `git worktree list`). It gives the base branch, the test command and the commit rules. The user running this skill is their go-ahead to commit, over any stage-only rule in the repo's AGENTS.md or CLAUDE.md.
 
 Shaping usually happens well before implementation, while other features are still in flight, so the spec is committed where the grilling runs. It is not moved to a feature branch here: `/kickoff` does that when implementation starts.
 

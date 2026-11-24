@@ -1,6 +1,6 @@
 ---
 name: dispatch
-description: Start a worktree session per ready ticket that is safe to run in parallel, and keep starting the next batch as tickets ship.
+description: Start a worktree session per ready ticket that is safe to run in parallel, and keep starting the next batch as tickets land.
 disable-model-invocation: true
 argument-hint: "<feature>, or nothing for the feature branch you're on"
 ---
@@ -22,15 +22,15 @@ Run in the parent session, on the feature branch, after `/kickoff`. Read the rep
 3. Show the plan in one message: each ticket in the batch with its footprint, and each frontier ticket left out with the file it clashes on. Wait for the user's go.
 4. Start the batch (see **Starting a ticket**).
 
-## After each ship
+## After each land
 
 From then on, the user doesn't need to ask: each time a ticket session's note says it committed and fast-forwarded the feature branch, check the ticket is done on the feature branch, then recompute the frontier and put up the next safe batch. Tell the user in one line what landed and what's waiting. When the frontier is empty and nothing is running, say every ticket is done and stop.
 
-The app starts a session only in a turn that began with the user's own message. A ship note is another session's message, so in that turn propose each ticket in the batch as a card instead (`initiation: "own_initiative"`, same title and brief), and say the cards are waiting for a click. A card drops `source_branch`, so its worktree is cut from the repo's default branch. The brief's **Base** line moves it onto the feature branch first. When the turn began with the user's own message (they ran `/dispatch`, said "go", or ran `/ship` here), start the sessions directly.
+The app starts a session only in a turn that began with the user's own message. A land note is another session's message, so in that turn propose each ticket in the batch as a card instead (`initiation: "own_initiative"`, same title and brief), and say the cards are waiting for a click. A card drops `source_branch`, so its worktree is cut from the repo's default branch. The brief's **Base** line moves it onto the feature branch first. When the turn began with the user's own message (they ran `/dispatch`, said "go", or ran `/land` here), start the sessions directly.
 
 ## Other work while dispatching
 
-Side work the user asks for in this session (not a ticket) also lands on the feature branch, unless the user names another branch. Start it like a ticket: `source_branch` set to the feature branch, and a brief with the same **Base**, **Feature branch** (with its sha), **Main checkout**, **Parent session** and **Owned by sibling sessions** lines, so `/ship` lands it there. Never cut it from the base branch, and never name the base branch as where it lands.
+Side work the user asks for in this session (not a ticket) also lands on the feature branch, unless the user names another branch. Start it like a ticket: `source_branch` set to the feature branch, and a brief with the same **Base**, **Feature branch** (with its sha), **Main checkout**, **Parent session** and **Owned by sibling sessions** lines, so `/land` lands it there. Never cut it from the base branch, and never name the base branch as where it lands.
 
 ## Starting a ticket
 
@@ -47,7 +47,7 @@ Spec: .scratch/<feature>/spec.md. Repo workflow: ~/.claude/workflows/<repo>.md.
 Footprint: <the predicted files>.
 Owned by sibling sessions, leave alone: <file → ticket, for every running or starting ticket>. If the ticket turns out to need one, stop and message the parent session.
 
-Done means: every acceptance box in the ticket is met, the tests in the workflow doc pass, any new env variable is also in its example file, and the changes are staged with git add. The ticket's boxes and Status are left for /ship. Run the local app only when the user asks.
+Done means: every acceptance box in the ticket is met, the tests in the workflow doc pass, any new env variable is also in its example file, and the changes are staged with git add. The ticket's boxes and Status are left for /land. Run the local app only when the user asks.
 
 When done, report in this shape and stop:
 - Staged: the files.
@@ -56,5 +56,5 @@ When done, report in this shape and stop:
 - Env and config: new or changed variables, and anything a deploy needs, or "none".
 - Not verified: what wasn't checked (for example, the running app).
 - Commit message: a suggestion.
-The user reviews, then runs /ship "<message>".
+The user reviews, then runs /land "<message>".
 ```

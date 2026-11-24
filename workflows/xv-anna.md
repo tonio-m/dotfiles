@@ -1,6 +1,6 @@
 # xv-anna feature workflow
 
-The repo facts that `/shape`, `/kickoff`, `/dispatch` and `/ship` read. The loop: `/shape` (grill, spec, tickets, commit), later `/kickoff`, `/dispatch`, then per ticket review and `/ship`.
+The repo facts that `/shape`, `/kickoff`, `/dispatch` and `/land` read. The loop: `/shape` (grill, spec, tickets, commit), later `/kickoff`, `/dispatch`, then per ticket review and `/land`.
 
 ## Branches
 
